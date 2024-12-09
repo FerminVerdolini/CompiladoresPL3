@@ -11,7 +11,12 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     @Override
     public String visitPrintStatement(MiniBParser.PrintStatementContext ctx){
-        return "lcd " + ctx.exp.getText();
+        String resultado = "ldc ";
+
+        // Procesar la expresión principal
+        resultado += evaluar(ctx.expression(0)).toString();
+
+        return resultado;
     }
 
 
@@ -90,7 +95,6 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         }
         return null;
     }
-
 
     @Override
     public String visitLetStatement(MiniBParser.LetStatementContext ctx){

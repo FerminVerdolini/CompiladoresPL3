@@ -25,7 +25,7 @@ ifStatement: IF condition THEN bloqueControl (ELSE bloqueControl)? END;
 whileStatement: WHILE condition bloqueControl END;
 
 // Declaración de impresión
-printStatement: PRINT exp=expression (PLUS expression)*;
+printStatement: PRINT expression (PLUS expression)*;
 
 // Declaración de entrada de usuario
 inputStatement: INPUT STRING IDENTIFIER;
