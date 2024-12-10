@@ -28,21 +28,22 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 "    .limit stack 10\n" +
                 "    .limit locals 10\n\n";
 
-        instrucciones += visitChildren(ctx);
+        for(int i=0; i<ctx.statement().size(); i++){
+            instrucciones += visitChildren(ctx.statement(i));
+        }
 
         return instrucciones;
     }
 
     @Override
     public String visitPrintStatement(MiniBParser.PrintStatementContext ctx){
-        String instrucciones = "    ldc ";
+        String instrucciones = "\n    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
+        instrucciones += "    ldc ";
 
         // Procesar la expresión principal
         instrucciones += evaluar(ctx.expression(0)).toString();
 
-        //instrucciones += "\n    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
-        instrucciones += "\n    getstatic java/lang/System/out Ljava/io/PrintStream;"
-                       + "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+        instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
 
         return instrucciones;
     }
@@ -61,14 +62,14 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             String operador = ctx.getChild(2 * i - 1).getText(); // PLUS o MINUS
 
             if (operador.equals("+")) {
-                if (resultado instanceof Double && siguiente instanceof Double) {
-                    resultado = (Double) resultado + (Double) siguiente;
+                if (resultado instanceof Integer && siguiente instanceof Integer) {
+                    resultado = (Integer) resultado + (Integer) siguiente;
                 } else if (resultado instanceof String || siguiente instanceof String) {
                     resultado = resultado.toString() + siguiente.toString();
                 }
             } else if (operador.equals("-")) {
-                if (resultado instanceof Double && siguiente instanceof Double) {
-                    resultado = (Double) resultado - (Double) siguiente;
+                if (resultado instanceof Integer && siguiente instanceof Integer) {
+                    resultado = (Integer) resultado - (Integer) siguiente;
                 } else {
                     throw new RuntimeException("Operación no válida para el operador '-'");
                 }
@@ -90,11 +91,11 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             String operador = ctx.getChild(2 * i - 1).getText(); // MULT, DIV, MOD
 
             if (operador.equals("*")) {
-                resultado = (Double) resultado * (Double) siguiente;
+                resultado = (Integer) resultado * (Integer) siguiente;
             } else if (operador.equals("/")) {
-                resultado = (Double) resultado / (Double) siguiente;
+                resultado = (Integer) resultado / (Integer) siguiente;
             } else if (operador.equals("%")) {
-                resultado = (Double) resultado % (Double) siguiente;
+                resultado = (Integer) resultado % (Integer) siguiente;
             }
         }
         return resultado;
@@ -104,7 +105,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     public Object visitFactor(MiniBParser.FactorContext ctx) {
         if (ctx.NUMBER() != null) {
             // Procesa números
-            return Double.parseDouble(ctx.NUMBER().getText());
+            return (ctx.NUMBER().getText());
         } else if (ctx.IDENTIFIER() != null) {
             // Procesa identificadores
             String nombre = ctx.IDENTIFIER().getText();
@@ -115,7 +116,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             return simbolo.getValor();
         } else if (ctx.STRING() != null) {
             // Procesa cadenas
-            return ctx.STRING().getText().replace("\"", ""); // Elimina las comillas
+            return ctx.STRING().getText();
         } else if (ctx.expression() != null) {
             // Procesa subexpresiones
             return evaluar(ctx.expression());
@@ -135,8 +136,8 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
         // Determinar el tipo del valor
         String tipo;
-        if (valor instanceof Double) {
-            tipo = "Double";
+        if (valor instanceof Integer) {
+            tipo = "Integer";
         } else if (valor instanceof String) {
             tipo = "String";
         } else if (valor instanceof Integer){
@@ -187,7 +188,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         String exp1 = "    ldc " + visitExpression(ctx.expression(0)) + "\n";
         String exp2 = "    ldc " + visitExpression(ctx.expression(1)) + "\n";
 
-        String instrucciones = exp1 + exp2;
+        String instrucciones = exp2 + exp1;
 
         String operador = ctx.getChild(1).getText();
 
