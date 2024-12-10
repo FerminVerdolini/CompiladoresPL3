@@ -5,18 +5,27 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     TablaSimbolos tablaSimbolos = new TablaSimbolos();
 
+    String instrucciones = ".class public IfExample\n" +
+            ".super java/lang/Object\n" +
+            "\n" +
+            ".method public static main([Ljava/lang/String;)V\n" +
+            "    .limit stack 10\n" +
+            "    .limit locals 10\n\n";
+
     private Object evaluar(ParseTree tree) {
         return tree.accept(this);
     }
 
     @Override
     public String visitPrintStatement(MiniBParser.PrintStatementContext ctx){
-        String resultado = "ldc ";
+        instrucciones += "    ldc ";
 
         // Procesar la expresión principal
-        resultado += evaluar(ctx.expression(0)).toString();
+        instrucciones += evaluar(ctx.expression(0)).toString();
 
-        return resultado;
+        instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+
+        return instrucciones;
     }
 
     @Override
@@ -73,18 +82,26 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     }
 
     @Override
-    public String visitFactor(MiniBParser.FactorContext ctx) {
-        String instrucciones = "";
-
+    public Object visitFactor(MiniBParser.FactorContext ctx) {
         if (ctx.NUMBER() != null) {
-            instrucciones += "    ldc " + ctx.NUMBER().getText() + "\n";  // Para un número
+            // Procesa números
+            return Double.parseDouble(ctx.NUMBER().getText());
         } else if (ctx.IDENTIFIER() != null) {
-            instrucciones += "    aload " + ctx.IDENTIFIER().getText() + "\n";  // Para una variable
+            // Procesa identificadores
+            String nombre = ctx.IDENTIFIER().getText();
+            Simbolo simbolo = tablaSimbolos.buscarSimbolo(nombre);
+            if (simbolo == null) {
+                throw new RuntimeException("Variable no declarada: " + nombre);
+            }
+            return simbolo.getValor();
         } else if (ctx.STRING() != null) {
-            instrucciones += "    ldc " + ctx.STRING().getText() + "\n";  // Para una cadena
+            // Procesa cadenas
+            return ctx.STRING().getText().replace("\"", ""); // Elimina las comillas
+        } else if (ctx.expression() != null) {
+            // Procesa subexpresiones
+            return evaluar(ctx.expression());
         }
-
-        return instrucciones;
+        return null;
     }
 
     @Override
@@ -121,36 +138,52 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         // Evaluar la condición (esto generará el código para la comparación)
         String instrucciones = (String) visitCondition(ctx.condition());
 
-        // Instrucciones para el bloque THEN (cuando la condición es verdadera)
-        instrucciones += "    ldc \"true\"\n";
-        instrucciones += "    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
-        instrucciones += "    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+        instrucciones += "; Bloque THEN\n";
 
-        // Etiqueta de salto para el bloque ELSE
-        String etiquetaElse = "ELSE_BLOCK" + System.currentTimeMillis();
-        instrucciones += "    goto " + etiquetaElse + "\n";  // Salta al bloque ELSE si la condición es falsa
+        instrucciones += visitBloqueControl(ctx.bloqueControl(0));
 
-        // Bloque ELSE
-        instrucciones += etiquetaElse + ":\n";
-        instrucciones += "    ldc \"false\"\n";
-        instrucciones += "    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
-        instrucciones += "    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+        instrucciones += "; Bloque ELSE\n";
+        instrucciones += visitBloqueControl(ctx.bloqueControl(1));
+
+        return instrucciones;
+    }
+
+    @Override
+    public String visitCondition(MiniBParser.ConditionContext ctx){
+
+        String exp1 = "    ldc " + visitExpression(ctx.expression(0)) + "\n";
+        String exp2 = "    ldc " + visitExpression(ctx.expression(1)) + "\n";
+
+        instrucciones = exp1 + exp2;
+
+        String operador = ctx.getChild(1).getText();
+
+        switch (operador) {
+            case "<":
+                instrucciones += "    if_icmplt "; break;
+            case "<=":
+                instrucciones += "    if_icmple "; break;
+            case ">":
+                instrucciones += "    if_icmpgt "; break;
+            case ">=":
+                instrucciones += "    if_icmpge "; break;
+            case "==":
+                instrucciones += "    if_icmpeq "; break;
+            case "!=":
+                instrucciones += "    if_icmpne "; break;
+            default:
+                throw new RuntimeException("Operador desconocido: " + operador);
+        }
+
+        instrucciones += "ELSE_BLOCK \n";
 
         return instrucciones;
     }
 
     @Override
     public String visitBloqueControl(MiniBParser.BloqueControlContext ctx) {
-        StringBuilder instrucciones = new StringBuilder();
-
-        for (MiniBParser.StatementContext statement : ctx.statement()) {
-            // Visitar cada statement y concatenar sus instrucciones
-            instrucciones.append(statement.accept(this)).append("\n");
-        }
-
-        return instrucciones.toString();
+        return (String) visitChildren(ctx);
     }
-
 
 
 }
