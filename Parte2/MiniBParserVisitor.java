@@ -16,54 +16,11 @@ public interface MiniBParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPrograma(MiniBParser.ProgramaContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code For}
-	 * labeled alternative in {@link MiniBParser#statement}.
+	 * Visit a parse tree produced by {@link MiniBParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFor(MiniBParser.ForContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code If}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIf(MiniBParser.IfContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code While}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitWhile(MiniBParser.WhileContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Print}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPrint(MiniBParser.PrintContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Input}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInput(MiniBParser.InputContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Let}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLet(MiniBParser.LetContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Repeat}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRepeat(MiniBParser.RepeatContext ctx);
+	T visitStatement(MiniBParser.StatementContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MiniBParser#forStatement}.
 	 * @param ctx the parse tree

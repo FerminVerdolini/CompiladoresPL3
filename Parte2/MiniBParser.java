@@ -168,153 +168,42 @@ public class MiniBParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class StatementContext extends ParserRuleContext {
+		public ForStatementContext forStatement() {
+			return getRuleContext(ForStatementContext.class,0);
+		}
+		public IfStatementContext ifStatement() {
+			return getRuleContext(IfStatementContext.class,0);
+		}
+		public WhileStatementContext whileStatement() {
+			return getRuleContext(WhileStatementContext.class,0);
+		}
+		public PrintStatementContext printStatement() {
+			return getRuleContext(PrintStatementContext.class,0);
+		}
+		public InputStatementContext inputStatement() {
+			return getRuleContext(InputStatementContext.class,0);
+		}
+		public LetStatementContext letStatement() {
+			return getRuleContext(LetStatementContext.class,0);
+		}
+		public RepeatStatementContext repeatStatement() {
+			return getRuleContext(RepeatStatementContext.class,0);
+		}
 		public StatementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_statement; }
-	 
-		public StatementContext() { }
-		public void copyFrom(StatementContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class PrintContext extends StatementContext {
-		public PrintStatementContext printStatement() {
-			return getRuleContext(PrintStatementContext.class,0);
-		}
-		public PrintContext(StatementContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterPrint(this);
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitPrint(this);
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitPrint(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class InputContext extends StatementContext {
-		public InputStatementContext inputStatement() {
-			return getRuleContext(InputStatementContext.class,0);
-		}
-		public InputContext(StatementContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterInput(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitInput(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitInput(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class ForContext extends StatementContext {
-		public ForStatementContext forStatement() {
-			return getRuleContext(ForStatementContext.class,0);
-		}
-		public ForContext(StatementContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterFor(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitFor(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitFor(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class LetContext extends StatementContext {
-		public LetStatementContext letStatement() {
-			return getRuleContext(LetStatementContext.class,0);
-		}
-		public LetContext(StatementContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterLet(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitLet(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitLet(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class RepeatContext extends StatementContext {
-		public RepeatStatementContext repeatStatement() {
-			return getRuleContext(RepeatStatementContext.class,0);
-		}
-		public RepeatContext(StatementContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterRepeat(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitRepeat(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitRepeat(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class WhileContext extends StatementContext {
-		public WhileStatementContext whileStatement() {
-			return getRuleContext(WhileStatementContext.class,0);
-		}
-		public WhileContext(StatementContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterWhile(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitWhile(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitWhile(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class IfContext extends StatementContext {
-		public IfStatementContext ifStatement() {
-			return getRuleContext(IfStatementContext.class,0);
-		}
-		public IfContext(StatementContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterIf(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitIf(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitIf(this);
+			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -327,7 +216,6 @@ public class MiniBParser extends Parser {
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case FOR:
-				_localctx = new ForContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(35);
@@ -335,7 +223,6 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case IF:
-				_localctx = new IfContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(36);
@@ -343,7 +230,6 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case WHILE:
-				_localctx = new WhileContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(37);
@@ -351,7 +237,6 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case PRINT:
-				_localctx = new PrintContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
 				setState(38);
@@ -359,7 +244,6 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case INPUT:
-				_localctx = new InputContext(_localctx);
 				enterOuterAlt(_localctx, 5);
 				{
 				setState(39);
@@ -368,7 +252,6 @@ public class MiniBParser extends Parser {
 				break;
 			case LET:
 			case IDENTIFIER:
-				_localctx = new LetContext(_localctx);
 				enterOuterAlt(_localctx, 6);
 				{
 				setState(40);
@@ -376,7 +259,6 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case REPEAT:
-				_localctx = new RepeatContext(_localctx);
 				enterOuterAlt(_localctx, 7);
 				{
 				setState(41);

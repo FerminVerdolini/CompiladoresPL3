@@ -26,22 +26,13 @@ public class Main {
         parser.setBuildParseTree(true);
         ParseTree tree = parser.programa();
 
-        System.out.println(tree.toStringTree(parser));
+        //System.out.println(tree.toStringTree(parser));
 
         return createJasminFile((String) new MyVisitor().visit(tree));
     }
 
     private static String createJasminFile(String instructions){
-        return ".class public Sumar\n"
-                + ".super java/lang/Object\n"
-                + "\n"
-                + ".method public static main([Ljava/lang/String;)V\n"
-                + "    .limit stack 100\n"
-                + "    .limit locals 100 \n"
-                + "\n"
-                + "    getstatic java/lang/System/out Ljava/io/PrintStream;\n"
-                + instructions + "\n"
-                + "    invokevirtual java/io/PrintStream/println(I)V\n"
+        return    instructions + "\n"
                 + "return\n"
                 + "\n"
                 + ".end method";

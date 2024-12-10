@@ -6,13 +6,13 @@ options { tokenVocab=MiniBLexer; }
 programa: statement+;
 
 // Declaraciones posibles en MiniB
-statement: forStatement     #For
-         | ifStatement      #If
-         | whileStatement   #While
-         | printStatement   #Print
-         | inputStatement   #Input
-         | letStatement     #Let
-         | repeatStatement  #Repeat
+statement: forStatement
+         | ifStatement
+         | whileStatement
+         | printStatement
+         | inputStatement
+         | letStatement
+         | repeatStatement
          ;
 
 // Bucle FOR

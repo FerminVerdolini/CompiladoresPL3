@@ -136,7 +136,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     @Override
     public String visitIfStatement(MiniBParser.IfStatementContext ctx) {
         // Evaluar la condición (esto generará el código para la comparación)
-        String instrucciones = (String) visitCondition(ctx.condition());
+        /*String instrucciones = (String) visitCondition(ctx.condition());
 
         instrucciones += "; Bloque THEN\n";
 
@@ -144,6 +144,30 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
         instrucciones += "; Bloque ELSE\n";
         instrucciones += visitBloqueControl(ctx.bloqueControl(1));
+
+        return instrucciones;*/
+
+        // Generar etiquetas únicas
+        String etiquetaElse = "ELSE_BLOCK_";
+        String etiquetaFin = "END_BLOCK_";
+
+        // Evaluar la condición
+        instrucciones += visitCondition(ctx.condition());
+
+        // Bloque THEN
+        instrucciones += "    ; Bloque THEN\n";
+        instrucciones += visitBloqueControl(ctx.bloqueControl(0));
+        instrucciones += "    goto " + etiquetaFin + "\n";  // Saltar al final del bloque
+
+        // Bloque ELSE
+        instrucciones += etiquetaElse + ":\n";
+        if (ctx.bloqueControl(1) != null) {
+            instrucciones += "    ; Bloque ELSE\n";
+            instrucciones += visitBloqueControl(ctx.bloqueControl(1));
+        }
+
+        // Etiqueta de fin
+        instrucciones += etiquetaFin + ":\n";
 
         return instrucciones;
     }
@@ -175,14 +199,16 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 throw new RuntimeException("Operador desconocido: " + operador);
         }
 
-        instrucciones += "ELSE_BLOCK \n";
-
         return instrucciones;
     }
 
     @Override
     public String visitBloqueControl(MiniBParser.BloqueControlContext ctx) {
-        return (String) visitChildren(ctx);
+        StringBuilder instrucciones = new StringBuilder();
+        for (MiniBParser.StatementContext statement : ctx.statement()) {
+            instrucciones.append(statement.accept(this)).append("\n");
+        }
+        return instrucciones.toString();
     }
 
 

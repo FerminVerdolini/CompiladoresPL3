@@ -17,89 +17,15 @@ public interface MiniBParserListener extends ParseTreeListener {
 	 */
 	void exitPrograma(MiniBParser.ProgramaContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code For}
-	 * labeled alternative in {@link MiniBParser#statement}.
+	 * Enter a parse tree produced by {@link MiniBParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterFor(MiniBParser.ForContext ctx);
+	void enterStatement(MiniBParser.StatementContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code For}
-	 * labeled alternative in {@link MiniBParser#statement}.
+	 * Exit a parse tree produced by {@link MiniBParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitFor(MiniBParser.ForContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code If}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterIf(MiniBParser.IfContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code If}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitIf(MiniBParser.IfContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code While}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterWhile(MiniBParser.WhileContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code While}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitWhile(MiniBParser.WhileContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Print}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterPrint(MiniBParser.PrintContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Print}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitPrint(MiniBParser.PrintContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Input}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterInput(MiniBParser.InputContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Input}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitInput(MiniBParser.InputContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Let}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterLet(MiniBParser.LetContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Let}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitLet(MiniBParser.LetContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Repeat}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterRepeat(MiniBParser.RepeatContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Repeat}
-	 * labeled alternative in {@link MiniBParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitRepeat(MiniBParser.RepeatContext ctx);
+	void exitStatement(MiniBParser.StatementContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MiniBParser#forStatement}.
 	 * @param ctx the parse tree
