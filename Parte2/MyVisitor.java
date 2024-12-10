@@ -4,26 +4,45 @@ import org.antlr.v4.runtime.tree.*;
 public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     TablaSimbolos tablaSimbolos = new TablaSimbolos();
+    Integer contador_if = 0;
 
+    /*
     String instrucciones = ".class public IfExample\n" +
             ".super java/lang/Object\n" +
             "\n" +
             ".method public static main([Ljava/lang/String;)V\n" +
             "    .limit stack 10\n" +
             "    .limit locals 10\n\n";
+*/
 
     private Object evaluar(ParseTree tree) {
         return tree.accept(this);
     }
 
     @Override
+    public Object visitPrograma(MiniBParser.ProgramaContext ctx) {
+        String instrucciones = ".class public IfExample\n" +
+                ".super java/lang/Object\n" +
+                "\n" +
+                ".method public static main([Ljava/lang/String;)V\n" +
+                "    .limit stack 10\n" +
+                "    .limit locals 10\n\n";
+
+        instrucciones += visitChildren(ctx);
+
+        return instrucciones;
+    }
+
+    @Override
     public String visitPrintStatement(MiniBParser.PrintStatementContext ctx){
-        instrucciones += "    ldc ";
+        String instrucciones = "    ldc ";
 
         // Procesar la expresión principal
         instrucciones += evaluar(ctx.expression(0)).toString();
 
-        instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+        //instrucciones += "\n    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
+        instrucciones += "\n    getstatic java/lang/System/out Ljava/io/PrintStream;"
+                       + "\n    invokevirtual java/io/PrintStream/println(I)V\n";
 
         return instrucciones;
     }
@@ -135,24 +154,14 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     @Override
     public String visitIfStatement(MiniBParser.IfStatementContext ctx) {
-        // Evaluar la condición (esto generará el código para la comparación)
-        /*String instrucciones = (String) visitCondition(ctx.condition());
-
-        instrucciones += "; Bloque THEN\n";
-
-        instrucciones += visitBloqueControl(ctx.bloqueControl(0));
-
-        instrucciones += "; Bloque ELSE\n";
-        instrucciones += visitBloqueControl(ctx.bloqueControl(1));
-
-        return instrucciones;*/
 
         // Generar etiquetas únicas
-        String etiquetaElse = "ELSE_BLOCK_";
-        String etiquetaFin = "END_BLOCK_";
+        String etiquetaElse = "ELSE_BLOCK_" + contador_if;
+        String etiquetaFin = "END_BLOCK_" + contador_if;
+        contador_if++;
 
         // Evaluar la condición
-        instrucciones += visitCondition(ctx.condition());
+        String instrucciones = visitCondition(ctx.condition()) + etiquetaElse;
 
         // Bloque THEN
         instrucciones += "    ; Bloque THEN\n";
@@ -178,7 +187,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         String exp1 = "    ldc " + visitExpression(ctx.expression(0)) + "\n";
         String exp2 = "    ldc " + visitExpression(ctx.expression(1)) + "\n";
 
-        instrucciones = exp1 + exp2;
+        String instrucciones = exp1 + exp2;
 
         String operador = ctx.getChild(1).getText();
 
@@ -206,7 +215,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     public String visitBloqueControl(MiniBParser.BloqueControlContext ctx) {
         StringBuilder instrucciones = new StringBuilder();
         for (MiniBParser.StatementContext statement : ctx.statement()) {
-            instrucciones.append(statement.accept(this)).append("\n");
+            instrucciones.append(statement.accept(this));
         }
         return instrucciones.toString();
     }
