@@ -14,7 +14,7 @@ echo "Generating lexer..."
 antlr4 MiniBLexer.g4
 
 echo "Generating parser..."
-antlr4 MiniBParser.g4
+antlr4 MiniBParser.g4 -visitor
 
 # Compile all Java files
 echo "Compiling Java files..."
