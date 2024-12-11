@@ -5,15 +5,11 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     TablaSimbolos tablaSimbolos = new TablaSimbolos();
     Integer contador_if = 0;
+    String file_name;
 
-    /*
-    String instrucciones = ".class public IfExample\n" +
-            ".super java/lang/Object\n" +
-            "\n" +
-            ".method public static main([Ljava/lang/String;)V\n" +
-            "    .limit stack 10\n" +
-            "    .limit locals 10\n\n";
-*/
+    public MyVisitor(String file_name) {
+        this.file_name = file_name;
+    }
 
     private Object evaluar(ParseTree tree) {
         return tree.accept(this);
@@ -21,7 +17,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     @Override
     public Object visitPrograma(MiniBParser.ProgramaContext ctx) {
-        String instrucciones = ".class public IfExample\n" +
+        String instrucciones = ".class public " + file_name + "\n" +
                 ".super java/lang/Object\n" +
                 "\n" +
                 ".method public static main([Ljava/lang/String;)V\n" +
@@ -150,7 +146,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         tablaSimbolos.agregarSimbolo(nombre, tipo, valor);
         tablaSimbolos.imprimirTabla();
 
-        return null; // No devuelve nada, ya que es una declaración
+        return ""; // No devuelve nada, ya que es una declaración
     }
 
     @Override
@@ -164,10 +160,15 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         // Evaluar la condición
         String instrucciones = visitCondition(ctx.condition()) + etiquetaElse;
 
+        if(ctx.condition().logicalOp().AND() != null){
+            instrucciones += "\n" + visitCondition(ctx.condition().condition()) + etiquetaElse;
+        }
+
         // Bloque THEN
         instrucciones += "    ; Bloque THEN\n";
         instrucciones += visitBloqueControl(ctx.bloqueControl(0));
         instrucciones += "    goto " + etiquetaFin + "\n";  // Saltar al final del bloque
+
 
         // Bloque ELSE
         instrucciones += etiquetaElse + ":\n";
@@ -185,28 +186,36 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     @Override
     public String visitCondition(MiniBParser.ConditionContext ctx){
 
-        String exp1 = "    ldc " + visitExpression(ctx.expression(0)) + "\n";
-        String exp2 = "    ldc " + visitExpression(ctx.expression(1)) + "\n";
+        String instrucciones = "";
+        if(ctx.expression().size() == 1) {
+            // Evalua la expresion de una sola expresion (0, != 0 o Boolean)
+            instrucciones += "    ldc " + visitExpression(ctx.expression(0)) + "\n";
+            instrucciones += "    ifeq ";
+        } else if (ctx.expression().size() == 2) {
+            // Evalua la comparacion de dos expresiones
+            String exp1 = "    ldc " + visitExpression(ctx.expression(0)) + "\n";
+            String exp2 = "    ldc " + visitExpression(ctx.expression(1)) + "\n";
 
-        String instrucciones = exp2 + exp1;
+            instrucciones += exp2 + exp1;
 
-        String operador = ctx.getChild(1).getText();
+            String operador = ctx.getChild(1).getText();
 
-        switch (operador) {
-            case "<":
-                instrucciones += "    if_icmplt "; break;
-            case "<=":
-                instrucciones += "    if_icmple "; break;
-            case ">":
-                instrucciones += "    if_icmpgt "; break;
-            case ">=":
-                instrucciones += "    if_icmpge "; break;
-            case "==":
-                instrucciones += "    if_icmpeq "; break;
-            case "!=":
-                instrucciones += "    if_icmpne "; break;
-            default:
-                throw new RuntimeException("Operador desconocido: " + operador);
+            switch (operador) {
+                case "<":
+                    instrucciones += "    if_icmplt "; break;
+                case "<=":
+                    instrucciones += "    if_icmple "; break;
+                case ">":
+                    instrucciones += "    if_icmpgt "; break;
+                case ">=":
+                    instrucciones += "    if_icmpge "; break;
+                case "==":
+                    instrucciones += "    if_icmpeq "; break;
+                case "!=":
+                    instrucciones += "    if_icmpne "; break;
+                default:
+                    throw new RuntimeException("Operador desconocido: " + operador);
+            }
         }
 
         return instrucciones;

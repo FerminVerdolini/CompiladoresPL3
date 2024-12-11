@@ -1,5 +1,8 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.File;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -15,11 +18,11 @@ public class Main {
 
         CharStream inputsream = null;
         if (inputFile != null){
-            System.out.println(compile(inputFile));
+            compile(inputFile);
         }
     }
 
-    public static String compile(String inputFile) throws Exception{
+    public static void compile(String inputFile) throws Exception{
         MiniBLexer lexer = new MiniBLexer(CharStreams.fromFileName(inputFile));
         MiniBParser parser = new MiniBParser(new CommonTokenStream(lexer));
 
@@ -27,14 +30,28 @@ public class Main {
         ParseTree tree = parser.programa();
 
         //System.out.println(tree.toStringTree(parser));
+        String fileName = new File(inputFile).getName().replaceFirst("\\.[^.]+$", "");
 
-        return createJasminFile((String) new MyVisitor().visit(tree));
+
+        createJasminFile((String) new MyVisitor(fileName).visit(tree), fileName+".j");
     }
 
-    private static String createJasminFile(String instructions){
-        return    instructions + "\n"
+    private static void createJasminFile(String instructions, String fileName) {
+        // Nombre del archivo de salida
+        String dir = "EjemplosJasmin/";
+
+        // Agregar las instrucciones de cierre al archivo Jasmin
+        String content = instructions + "\n"
                 + "return\n"
                 + "\n"
                 + ".end method";
+
+        try (FileWriter fileWriter = new FileWriter(dir+fileName)) {
+            // Escribir el contenido en el archivo
+            fileWriter.write(content);
+            System.out.println("Archivo generado exitosamente: " + fileName);
+        } catch (IOException e) {
+            System.err.println("Error al escribir el archivo: " + e.getMessage());
+        }
     }
 }
