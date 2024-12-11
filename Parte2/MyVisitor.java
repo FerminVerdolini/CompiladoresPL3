@@ -36,10 +36,15 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         String instrucciones = "\n    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
         instrucciones += "    ldc ";
 
-        // Procesar la expresión principal
-        instrucciones += evaluar(ctx.expression(0)).toString();
-
-        instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+        if(evaluar(ctx.expression(0)) instanceof String){
+            // Si la expresion es String llama a la funcion y lo evalua entre comillas
+            instrucciones += "\"" + evaluar(ctx.expression(0)) + "\"";
+            instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+        } else if (evaluar(ctx.expression(0)) instanceof Integer) {
+            // Si la expresion es Integer llama a la funcion correspondiente para imprimir enteros
+            instrucciones += evaluar(ctx.expression(0));
+            instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+        }
 
         return instrucciones;
     }
@@ -47,7 +52,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     @Override
     public Object visitExpression(MiniBParser.ExpressionContext ctx) {
         if (ctx.term().size() == 1) {
-            // Si la expresión tiene un solo término, evalúalo directamente
+            // Si la expresión tiene un solo término, se evalúa directamente
             return evaluar(ctx.term(0));
         }
 
@@ -84,13 +89,13 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         Object resultado = evaluar(ctx.factor(0));
         for (int i = 1; i < ctx.factor().size(); i++) {
             Object siguiente = evaluar(ctx.factor(i));
-            String operador = ctx.getChild(2 * i - 1).getText(); // MULT, DIV, MOD
+            String operador = ctx.getChild(2 * i - 1).getText().toUpperCase(); // MULT, DIV, MOD
 
             if (operador.equals("*")) {
                 resultado = (Integer) resultado * (Integer) siguiente;
             } else if (operador.equals("/")) {
                 resultado = (Integer) resultado / (Integer) siguiente;
-            } else if (operador.equals("%")) {
+            } else if (operador.equals("%") || operador.equals("MOD")) {
                 resultado = (Integer) resultado % (Integer) siguiente;
             }
         }
@@ -101,7 +106,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     public Object visitFactor(MiniBParser.FactorContext ctx) {
         if (ctx.NUMBER() != null) {
             // Procesa números
-            return (ctx.NUMBER().getText());
+            return (Integer.parseInt((ctx.NUMBER().getText())));
         } else if (ctx.IDENTIFIER() != null) {
             // Procesa identificadores
             String nombre = ctx.IDENTIFIER().getText();
@@ -111,10 +116,8 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             }
             return simbolo.getValor();
         } else if (ctx.STRING() != null) {
-            // Procesa cadenas
-            return ctx.STRING().getText();
+            return ctx.STRING().getText().replace("\"", "");
         } else if (ctx.expression() != null) {
-            // Procesa subexpresiones
             return evaluar(ctx.expression());
         }
         return null;
@@ -160,9 +163,10 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         // Evaluar la condición
         String instrucciones = visitCondition(ctx.condition()) + etiquetaElse;
 
-        if(ctx.condition().logicalOp().AND() != null){
+        if(ctx.condition().children.contains(ctx.condition().logicalOp())){
             instrucciones += "\n" + visitCondition(ctx.condition().condition()) + etiquetaElse;
         }
+
 
         // Bloque THEN
         instrucciones += "    ; Bloque THEN\n";

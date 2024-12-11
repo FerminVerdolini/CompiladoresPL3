@@ -6,4 +6,4 @@ if 0 then
   print "two"
 end
 
-print "three"
+print "thre"

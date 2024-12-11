@@ -1,4 +1,4 @@
-.class public IfExample
+.class public if_else
 .super java/lang/Object
 
 .method public static main([Ljava/lang/String;)V
