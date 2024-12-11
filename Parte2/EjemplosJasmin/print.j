@@ -2,8 +2,8 @@
 .super java/lang/Object
 
 .method public static main([Ljava/lang/String;)V
-    .limit stack 10
-    .limit locals 10
+    .limit stack 100
+    .limit locals 100
 
 
     getstatic java/lang/System/out Ljava/io/PrintStream;

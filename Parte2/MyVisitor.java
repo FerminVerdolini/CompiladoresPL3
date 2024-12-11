@@ -5,7 +5,9 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     TablaSimbolos tablaSimbolos = new TablaSimbolos();
     Integer contador_if = 0;
+    Integer contador_for = 0;
     String file_name;
+    Boolean is_identifier = false;
 
     public MyVisitor(String file_name) {
         this.file_name = file_name;
@@ -21,26 +23,35 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 ".super java/lang/Object\n" +
                 "\n" +
                 ".method public static main([Ljava/lang/String;)V\n" +
-                "    .limit stack 10\n" +
-                "    .limit locals 10\n\n";
+                "    .limit stack 100\n" +
+                "    .limit locals 100\n\n";
 
         for(int i=0; i<ctx.statement().size(); i++){
             instrucciones += visitChildren(ctx.statement(i));
         }
-
         return instrucciones;
     }
 
     @Override
     public String visitPrintStatement(MiniBParser.PrintStatementContext ctx){
         String instrucciones = "\n    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
-        instrucciones += "    ldc ";
 
-        if(evaluar(ctx.expression(0)) instanceof String){
+        evaluar(ctx.expression(0));
+
+        if(is_identifier){
+            is_identifier = false;
+            // Si la expresion es Integer llama a la funcion correspondiente para imprimir enteros
+            instrucciones += evaluar(ctx.expression(0));
+            instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+
+        } else if(evaluar(ctx.expression(0)) instanceof String){
+            instrucciones += "    ldc ";
             // Si la expresion es String llama a la funcion y lo evalua entre comillas
             instrucciones += "\"" + evaluar(ctx.expression(0)) + "\"";
             instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+
         } else if (evaluar(ctx.expression(0)) instanceof Integer) {
+            instrucciones += "    ldc ";
             // Si la expresion es Integer llama a la funcion correspondiente para imprimir enteros
             instrucciones += evaluar(ctx.expression(0));
             instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
@@ -114,13 +125,14 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             if (simbolo == null) {
                 throw new RuntimeException("Variable no declarada: " + nombre);
             }
-            return simbolo.getValor();
+            is_identifier = true;
+            return simbolo.cargarEnPila().replace("\"","") + "\n";
         } else if (ctx.STRING() != null) {
             return ctx.STRING().getText().replace("\"", "");
         } else if (ctx.expression() != null) {
             return evaluar(ctx.expression());
         }
-        return null;
+        return "";
     }
 
     @Override
@@ -234,5 +246,43 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return instrucciones.toString();
     }
 
+    @Override
+    public Object visitForStatement(MiniBParser.ForStatementContext ctx) {
+        String resultado = "   ; Inicializar las variables locales: \n";
 
+        Integer limite = (Integer) evaluar(ctx.expression(1));
+
+        tablaSimbolos.agregarSimbolo(ctx.IDENTIFIER().getText(), "Integer", evaluar(ctx.expression(0)));
+        Simbolo indice = tablaSimbolos.buscarSimbolo(ctx.IDENTIFIER().getText());
+
+        Integer indice_valor = (Integer) indice.getValor();
+        String indice_registro = indice.getRegistro();
+
+
+        resultado += "    ldc " + indice_valor + "        ; Cargar el valor inicial\n"
+                  + indice_registro + "          ; Guardar en la variable local 1\n\n";
+
+        resultado += "    ldc " + limite + "        ; Cargar el valor final\n"
+                  +  "    istore_2      ; Guardar en la variable local 2\n\n";
+
+        resultado += "LOOP_START_" + contador_for + ":\n"
+                  +  indice.cargarEnPila() + "       ; Cargar i\n"
+                  +  "    iload_2       ; Cargar end\n"
+                  +  "    if_icmpgt LOOP_END_" + contador_for + "\n\n"
+                  +  "    ; Cuerpo del bucle \n";
+
+        resultado += evaluar(ctx.bloqueControl());
+
+        resultado += "\n    ; Incrementar i: 1 = 1 + i \n"
+                  +  indice.cargarEnPila() + "           ; Cargar i\n"
+                  +  "    iconst_1      ; Cargar el incremento \n"
+                  +  "    iadd          ; Sumar i + 1\n"
+                  +  indice_registro + "          ; Guardar el nuevo valor de i\n\n"
+                  +  "    goto LOOP_START_" + contador_for + "\n"
+                  +  "    LOOP_END_" + contador_for + ":\n";
+
+        contador_for++;
+
+        return resultado;
+    }
 }
