@@ -199,7 +199,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                     Integer int_aux = Integer.parseInt(str_aux);
                     resultado = str_aux;
                 } catch (NumberFormatException e){
-                    resultado = "NaN";
+                    resultado = "0";
                 }
             }else {
                 resultado = str_aux;
