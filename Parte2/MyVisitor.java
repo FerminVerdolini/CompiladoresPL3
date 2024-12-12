@@ -3,9 +3,10 @@ import org.antlr.v4.runtime.tree.*;
 public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     TablaSimbolos tablaSimbolos = new TablaSimbolos();
-    Integer contador_if = 0;
-    Integer contador_for = 0;
-    Integer contador_while = 0;
+    Integer cont_if = 0;
+    Integer cont_for = 0;
+    Integer cont_while = 0;
+    Integer cont_repeat = 0;
     String file_name;
     Boolean is_identifier = false;
 
@@ -249,9 +250,9 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     public String visitIfStatement(MiniBParser.IfStatementContext ctx) {
 
         // Generar etiquetas únicas
-        String etiquetaElse = "ELSE_BLOCK_" + contador_if;
-        String etiquetaFin = "END_BLOCK_" + contador_if;
-        contador_if++;
+        String etiquetaElse = "ELSE_BLOCK_" + cont_if;
+        String etiquetaFin = "END_BLOCK_" + cont_if;
+        cont_if++;
 
         // Evaluar la condición
         String instrucciones = visitCondition(ctx.condition()) + etiquetaElse;
@@ -344,7 +345,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             instrucciones.append("    goto INCREMENTAR\n");
 
         if(ctx.EXIT() != null){
-            instrucciones.append("    goto LOOP_END_").append(contador_for).append("\n");
+            instrucciones.append("    goto LOOP_END_").append(cont_for).append("\n");
         }
         return instrucciones.toString();
     }
@@ -368,10 +369,10 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         resultado += "    ldc " + limite + "        ; Cargar el valor final\n"
                   +  "    istore_2      ; Guardar en la variable local 2\n\n";
 
-        resultado += "LOOP_START_" + contador_for + ":\n"
+        resultado += "LOOP_START_" + cont_for + ":\n"
                   +  "    " + indice.cargarEnPila() + "       ; Cargar i\n"
                   +  "    iload_2       ; Cargar end\n"
-                  +  "    if_icmpgt LOOP_END_" + contador_for + "\n\n"
+                  +  "    if_icmpgt LOOP_END_" + cont_for + "\n\n"
                   +  "    ; Cuerpo del bucle \n";
 
         // Se evalua el bloque de control.
@@ -383,24 +384,40 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                   +  "    iconst_1      ; Cargar el incremento \n"
                   +  "    iadd          ; Sumar i + 1\n"
                   +  "    " + indice_registro + "          ; Guardar el nuevo valor de i\n\n"
-                  +  "    goto LOOP_START_" + contador_for + "\n"
-                  +  "    LOOP_END_" + contador_for + ":\n";
+                  +  "    goto LOOP_START_" + cont_for + "\n"
+                  +  "    LOOP_END_" + cont_for + ":\n";
 
-        contador_for++;
+        cont_for++;
 
         return resultado;
     }
 
     @Override
     public Object visitWhileStatement(MiniBParser.WhileStatementContext ctx) {
-        String resultado = "WHILE_START_" + contador_while + ":\n";
+        String resultado = "WHILE_START_" + cont_while + ":\n";
 
-        resultado += visitCondition(ctx.condition()) + " WHILE_END_" + contador_while + "\n";
+        resultado += visitCondition(ctx.condition()) + " WHILE_END_" + cont_while + "\n";
         resultado += visitBloqueControl(ctx.bloqueControl());
-        resultado += "    goto WHILE_START_" + contador_while + "\n"
-                  +  "WHILE_END_" + contador_while + ": \n";
+        resultado += "    goto WHILE_START_" + cont_while + "\n"
+                  +  "WHILE_END_" + cont_while + ": \n";
 
-        contador_while++;
+        cont_while++;
+        return resultado;
+    }
+
+    @Override
+    public Object visitRepeatStatement(MiniBParser.RepeatStatementContext ctx) {
+        String resultado = "REPEAT_START_" + cont_repeat + ":\n";
+
+        for(int i=0; i<ctx.statement().size(); i++)
+            resultado += evaluar(ctx.statement(i));
+
+        resultado += "\n    ; UNTIL \n";
+        resultado += visitCondition(ctx.condition()) + " END" + "\n"
+                  +  "    goto REPEAT_START_" + cont_repeat + "\n"
+                  +  "END:" + "\n";
+
+        cont_repeat++;
         return resultado;
     }
 }
