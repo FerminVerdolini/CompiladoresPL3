@@ -125,7 +125,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 throw new RuntimeException("Variable no declarada: " + nombre);
             }
             is_identifier = true;
-            return simbolo.cargarEnPila().replace("\"","") + "\n";
+            return "    " + simbolo.cargarEnPila().replace("\"","") + "\n";
         } else if (ctx.STRING() != null) {
             return ctx.STRING().getText().replace("\"", "");
         } else if (ctx.expression() != null) {
@@ -267,6 +267,12 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         for (MiniBParser.StatementContext statement : ctx.statement()) {
             instrucciones.append(statement.accept(this));
         }
+        if(ctx.CONTINUE() != null)
+            instrucciones.append("    goto INCREMENTAR\n");
+
+        if(ctx.EXIT() != null){
+            instrucciones.append("    goto LOOP_END_").append(contador_for).append("\n");
+        }
         return instrucciones.toString();
     }
 
@@ -284,24 +290,26 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
 
         resultado += "    ldc " + indice_valor + "        ; Cargar el valor inicial\n"
-                  + indice_registro + "          ; Guardar en la variable local 1\n\n";
+                  + "    " + indice_registro + "          ; Guardar en la variable local 1\n\n";
 
         resultado += "    ldc " + limite + "        ; Cargar el valor final\n"
                   +  "    istore_2      ; Guardar en la variable local 2\n\n";
 
         resultado += "LOOP_START_" + contador_for + ":\n"
-                  +  indice.cargarEnPila() + "       ; Cargar i\n"
+                  +  "    " + indice.cargarEnPila() + "       ; Cargar i\n"
                   +  "    iload_2       ; Cargar end\n"
                   +  "    if_icmpgt LOOP_END_" + contador_for + "\n\n"
                   +  "    ; Cuerpo del bucle \n";
 
-        resultado += evaluar(ctx.bloqueControl());
+        // Se evalua el bloque de control.
+        resultado += visitBloqueControl(ctx.bloqueControl());
 
-        resultado += "\n    ; Incrementar i: 1 = 1 + i \n"
-                  +  indice.cargarEnPila() + "           ; Cargar i\n"
+        resultado += "INCREMENTAR: "
+                  +  "\n    ; Incrementar i: 1 = 1 + i \n"
+                  +  "    " + indice.cargarEnPila() + "           ; Cargar i\n"
                   +  "    iconst_1      ; Cargar el incremento \n"
                   +  "    iadd          ; Sumar i + 1\n"
-                  +  indice_registro + "          ; Guardar el nuevo valor de i\n\n"
+                  +  "    " + indice_registro + "          ; Guardar el nuevo valor de i\n\n"
                   +  "    goto LOOP_START_" + contador_for + "\n"
                   +  "    LOOP_END_" + contador_for + ":\n";
 
