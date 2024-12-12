@@ -1,5 +1,7 @@
 *.interp
 *.tokens
 *.class
+out/
 .antlr/
+
 
