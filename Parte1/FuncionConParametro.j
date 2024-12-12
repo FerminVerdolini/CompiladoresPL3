@@ -6,11 +6,11 @@
     .limit stack 3
     .limit locals 2
 
-    ; Cargar el valor del parámetro (por ejemplo, 10)
+    ; Cargar el valor del parámetro
     bipush 10      ; Cargar el valor 10 en el stack
 
-    ; Llamar a la función "miFuncion" con el parámetro
-    invokestatic FuncionConParametro/miFuncion(I)I
+    ; Llamar a la función "duplicarValor" con el parámetro
+    invokestatic FuncionConParametro/duplicarValor(I)I
 
     ; Guardar el resultado en la variable local 1
     istore_1       
@@ -24,8 +24,8 @@
     return
 .end method
 
-; Definición de la función "miFuncion"
-.method public static miFuncion(I)I
+; Definición de la función "duplicarValor"
+.method public static duplicarValor(I)I
     .limit stack 2
     .limit locals 1
 
