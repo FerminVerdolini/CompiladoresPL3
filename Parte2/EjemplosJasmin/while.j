@@ -19,7 +19,7 @@ WHILE_START_0:
 
     invokevirtual java/io/PrintStream/println(I)V
     iload_0
-   ldc 1
+    ldc 1
     iadd
 istore_0
     goto WHILE_START_0

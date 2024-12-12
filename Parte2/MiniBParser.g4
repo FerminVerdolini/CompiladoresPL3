@@ -46,10 +46,11 @@ bloqueControl: (statement+ | CONTINUE | EXIT);
 condition: expression ((LT | LTE | GT | GTE | EQ | NEQ) expression)? (logicalOp condition)?;
 expression: term ((PLUS | MINUS) term)*;
 term: factor ((MULT | DIV | MOD) factor)*;
-factor: NUMBER
-      | IDENTIFIER
-      | LPAREN expression RPAREN
-      | STRING
-      | VAL LPAREN expression RPAREN
-      | LEN LPAREN expression RPAREN
-      | ISNAN LPAREN expression RPAREN;
+factor: NUMBER                          #Numb
+      | IDENTIFIER                      #Ident
+      | LPAREN expression RPAREN        #Parent
+      | STRING                          #Cadena
+      | VAL LPAREN expression RPAREN    #Val
+      | LEN LPAREN expression RPAREN    #Len
+      | ISNAN LPAREN expression RPAREN  #Isnan
+      ;

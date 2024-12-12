@@ -22,7 +22,7 @@ WHILE_START_0:
     ldc "x es par y menor que el límite"
     invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
     iload_0
-   ldc 2
+    ldc 2
     iadd
 istore_0
     goto WHILE_START_0

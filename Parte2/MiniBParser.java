@@ -1148,32 +1148,158 @@ public class MiniBParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class FactorContext extends ParserRuleContext {
-		public TerminalNode NUMBER() { return getToken(MiniBParser.NUMBER, 0); }
-		public TerminalNode IDENTIFIER() { return getToken(MiniBParser.IDENTIFIER, 0); }
+		public FactorContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_factor; }
+	 
+		public FactorContext() { }
+		public void copyFrom(FactorContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class ValContext extends FactorContext {
+		public TerminalNode VAL() { return getToken(MiniBParser.VAL, 0); }
 		public TerminalNode LPAREN() { return getToken(MiniBParser.LPAREN, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public TerminalNode RPAREN() { return getToken(MiniBParser.RPAREN, 0); }
-		public TerminalNode STRING() { return getToken(MiniBParser.STRING, 0); }
-		public TerminalNode VAL() { return getToken(MiniBParser.VAL, 0); }
-		public TerminalNode LEN() { return getToken(MiniBParser.LEN, 0); }
-		public TerminalNode ISNAN() { return getToken(MiniBParser.ISNAN, 0); }
-		public FactorContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_factor; }
+		public ValContext(FactorContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterFactor(this);
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterVal(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitFactor(this);
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitVal(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitFactor(this);
+			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitVal(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class IdentContext extends FactorContext {
+		public TerminalNode IDENTIFIER() { return getToken(MiniBParser.IDENTIFIER, 0); }
+		public IdentContext(FactorContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterIdent(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitIdent(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitIdent(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class LenContext extends FactorContext {
+		public TerminalNode LEN() { return getToken(MiniBParser.LEN, 0); }
+		public TerminalNode LPAREN() { return getToken(MiniBParser.LPAREN, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public TerminalNode RPAREN() { return getToken(MiniBParser.RPAREN, 0); }
+		public LenContext(FactorContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterLen(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitLen(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitLen(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class ParentContext extends FactorContext {
+		public TerminalNode LPAREN() { return getToken(MiniBParser.LPAREN, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public TerminalNode RPAREN() { return getToken(MiniBParser.RPAREN, 0); }
+		public ParentContext(FactorContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterParent(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitParent(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitParent(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class CadenaContext extends FactorContext {
+		public TerminalNode STRING() { return getToken(MiniBParser.STRING, 0); }
+		public CadenaContext(FactorContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterCadena(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitCadena(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitCadena(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class NumbContext extends FactorContext {
+		public TerminalNode NUMBER() { return getToken(MiniBParser.NUMBER, 0); }
+		public NumbContext(FactorContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterNumb(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitNumb(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitNumb(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class IsnanContext extends FactorContext {
+		public TerminalNode ISNAN() { return getToken(MiniBParser.ISNAN, 0); }
+		public TerminalNode LPAREN() { return getToken(MiniBParser.LPAREN, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public TerminalNode RPAREN() { return getToken(MiniBParser.RPAREN, 0); }
+		public IsnanContext(FactorContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).enterIsnan(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBParserListener ) ((MiniBParserListener)listener).exitIsnan(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof MiniBParserVisitor ) return ((MiniBParserVisitor<? extends T>)visitor).visitIsnan(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1186,6 +1312,7 @@ public class MiniBParser extends Parser {
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case NUMBER:
+				_localctx = new NumbContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(134);
@@ -1193,6 +1320,7 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case IDENTIFIER:
+				_localctx = new IdentContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(135);
@@ -1200,6 +1328,7 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case LPAREN:
+				_localctx = new ParentContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(136);
@@ -1211,6 +1340,7 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case STRING:
+				_localctx = new CadenaContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
 				setState(140);
@@ -1218,6 +1348,7 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case VAL:
+				_localctx = new ValContext(_localctx);
 				enterOuterAlt(_localctx, 5);
 				{
 				setState(141);
@@ -1231,6 +1362,7 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case LEN:
+				_localctx = new LenContext(_localctx);
 				enterOuterAlt(_localctx, 6);
 				{
 				setState(146);
@@ -1244,6 +1376,7 @@ public class MiniBParser extends Parser {
 				}
 				break;
 			case ISNAN:
+				_localctx = new IsnanContext(_localctx);
 				enterOuterAlt(_localctx, 7);
 				{
 				setState(151);

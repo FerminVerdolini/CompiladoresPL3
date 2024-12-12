@@ -176,46 +176,54 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitFactor(MiniBParser.FactorContext ctx) {
-        String resultado = "";
-        if (ctx.NUMBER() != null) {
-            // Procesa números
-            if(is_identifier)
-                resultado = "   ldc " + Integer.parseInt((ctx.NUMBER().getText())) + "\n"
-                          +  (Integer.parseInt((ctx.NUMBER().getText())));
-        } else if (ctx.IDENTIFIER() != null) {
-            // Procesa identificadores
-            String nombre = ctx.IDENTIFIER().getText();
-            Simbolo simbolo = tablaSimbolos.buscarSimbolo(nombre);
-            if (simbolo == null) {
-                throw new RuntimeException("Variable no declarada: " + nombre);
-            }
-            is_identifier = true;
-            resultado = "    " + simbolo.cargarEnPila().replace("\"","") + "\n";
-        } else if (ctx.STRING() != null) {
-            String str_aux = ctx.STRING().getText().replace("\"", "");
-            if(is_val){
-                try {
-                    Integer int_aux = Integer.parseInt(str_aux);
-                    resultado = str_aux;
-                } catch (NumberFormatException e){
-                    resultado = "0";
-                }
-            }else {
-                resultado = str_aux;
-            }
-        } else if(ctx.VAL() != null){
-            is_val = true;
-            resultado = (String) evaluar(ctx.expression());
-        } else if (ctx.LEN() != null){
-            String aux = (String) evaluar(ctx.expression());
-            resultado = String.valueOf(aux.length());
-        } else if (ctx.ISNAN() != null) {
-            String aux = (String) evaluar(ctx.expression());
-            resultado = aux.equals("NaN") ? "true" : "false";
+    public Object visitNumb(MiniBParser.NumbContext ctx) {
+        if(is_identifier)
+            return "    ldc " + Integer.parseInt((ctx.NUMBER().getText())) + "\n";
+        return Integer.parseInt((ctx.NUMBER().getText()));
+    }
+
+    @Override
+    public Object visitIdent(MiniBParser.IdentContext ctx) {
+        String nombre = ctx.IDENTIFIER().getText();
+        Simbolo simbolo = tablaSimbolos.buscarSimbolo(nombre);
+        if (simbolo == null) {
+            throw new RuntimeException("Variable no declarada: " + nombre);
         }
-        is_val = false;
-        return resultado;
+        is_identifier = true;
+        return "    " + simbolo.cargarEnPila().replace("\"","") + "\n";
+    }
+
+    @Override
+    public Object visitParent(MiniBParser.ParentContext ctx) {
+        return super.visitParent(ctx);
+    }
+
+    @Override
+    public Object visitCadena(MiniBParser.CadenaContext ctx) {
+        return ctx.STRING().getText().replace("\"", "");
+    }
+
+    @Override
+    public Object visitVal(MiniBParser.ValContext ctx) {
+        String str_aux = (String) evaluar(ctx.expression());
+        try {
+            Integer.parseInt(str_aux);
+            return str_aux;
+        } catch (NumberFormatException e){
+            return "0";
+        }
+    }
+
+    @Override
+    public Object visitLen(MiniBParser.LenContext ctx) {
+        String aux = (String) evaluar(ctx.expression());
+        return String.valueOf(aux.length());
+    }
+
+    @Override
+    public Object visitIsnan(MiniBParser.IsnanContext ctx) {
+        String aux = (String) evaluar(ctx.expression());
+        return aux.equals("NaN") ? "true" : "false";
     }
 
     @Override

@@ -94,9 +94,52 @@ public interface MiniBParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTerm(MiniBParser.TermContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MiniBParser#factor}.
+	 * Visit a parse tree produced by the {@code Numb}
+	 * labeled alternative in {@link MiniBParser#factor}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFactor(MiniBParser.FactorContext ctx);
+	T visitNumb(MiniBParser.NumbContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Ident}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIdent(MiniBParser.IdentContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Parent}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParent(MiniBParser.ParentContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Cadena}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCadena(MiniBParser.CadenaContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Val}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVal(MiniBParser.ValContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Len}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLen(MiniBParser.LenContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Isnan}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIsnan(MiniBParser.IsnanContext ctx);
 }

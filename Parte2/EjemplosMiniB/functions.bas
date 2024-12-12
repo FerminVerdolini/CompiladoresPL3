@@ -1,3 +1,3 @@
-PRINT VAL("algo")
+PRINT VAL("123")
 PRINT LEN("12345")
 PRINT ISNAN(VAL("Not a number"))
