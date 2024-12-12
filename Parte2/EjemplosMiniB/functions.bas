@@ -1,3 +1,3 @@
 PRINT VAL("123")
 PRINT LEN("12345")
-PRINT ISNAN(VAL("not a number"))
+PRINT ISNAN(VAL("Not a number"))

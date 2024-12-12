@@ -9,6 +9,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     Integer cont_repeat = 0;
     String file_name;
     Boolean is_identifier = false;
+    Boolean is_val = false;
 
     public MyVisitor(String file_name) {
         this.file_name = file_name;
@@ -176,12 +177,12 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     @Override
     public Object visitFactor(MiniBParser.FactorContext ctx) {
+        String resultado = "";
         if (ctx.NUMBER() != null) {
             // Procesa números
             if(is_identifier)
-                return "   ldc " + Integer.parseInt((ctx.NUMBER().getText())) + "\n";
-
-            return (Integer.parseInt((ctx.NUMBER().getText())));
+                resultado = "   ldc " + Integer.parseInt((ctx.NUMBER().getText())) + "\n"
+                          +  (Integer.parseInt((ctx.NUMBER().getText())));
         } else if (ctx.IDENTIFIER() != null) {
             // Procesa identificadores
             String nombre = ctx.IDENTIFIER().getText();
@@ -190,13 +191,31 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 throw new RuntimeException("Variable no declarada: " + nombre);
             }
             is_identifier = true;
-            return "    " + simbolo.cargarEnPila().replace("\"","") + "\n";
+            resultado = "    " + simbolo.cargarEnPila().replace("\"","") + "\n";
         } else if (ctx.STRING() != null) {
-            return ctx.STRING().getText().replace("\"", "");
-        } else if (ctx.expression() != null) {
-            return evaluar(ctx.expression());
+            String str_aux = ctx.STRING().getText().replace("\"", "");
+            if(is_val){
+                try {
+                    Integer int_aux = Integer.parseInt(str_aux);
+                    resultado = str_aux;
+                } catch (NumberFormatException e){
+                    resultado = "NaN";
+                }
+            }else {
+                resultado = str_aux;
+            }
+        } else if(ctx.VAL() != null){
+            is_val = true;
+            resultado = (String) evaluar(ctx.expression());
+        } else if (ctx.LEN() != null){
+            String aux = (String) evaluar(ctx.expression());
+            resultado = String.valueOf(aux.length());
+        } else if (ctx.ISNAN() != null) {
+            String aux = (String) evaluar(ctx.expression());
+            resultado = aux.equals("NaN") ? "true" : "false";
         }
-        return "";
+        is_val = false;
+        return resultado;
     }
 
     @Override
@@ -420,4 +439,6 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         cont_repeat++;
         return resultado;
     }
+
+
 }

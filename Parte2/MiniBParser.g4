@@ -48,7 +48,7 @@ expression: term ((PLUS | MINUS) term)*;
 term: factor ((MULT | DIV | MOD) factor)*;
 factor: NUMBER
       | IDENTIFIER
-      | LPAREN expression RPAREN 
+      | LPAREN expression RPAREN
       | STRING
       | VAL LPAREN expression RPAREN
       | LEN LPAREN expression RPAREN
