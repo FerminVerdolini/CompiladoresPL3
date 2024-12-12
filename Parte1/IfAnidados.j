@@ -5,7 +5,7 @@
     .limit stack 2
     .limit locals 1
 
-    ; Declarar un número (modifica este valor para probar diferentes casos)
+    ; Declarar un número
     ldc 15           ; Número a evaluar
     istore_0         ; Guardar en la variable local 0
 

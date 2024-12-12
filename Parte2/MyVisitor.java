@@ -5,6 +5,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     TablaSimbolos tablaSimbolos = new TablaSimbolos();
     Integer contador_if = 0;
     Integer contador_for = 0;
+    Integer contador_while = 0;
     String file_name;
     Boolean is_identifier = false;
 
@@ -61,61 +62,124 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     @Override
     public Object visitExpression(MiniBParser.ExpressionContext ctx) {
-        if (ctx.term().size() == 1) {
-            // Si la expresión tiene un solo término, se evalúa directamente
-            return evaluar(ctx.term(0));
-        }
 
-        // Procesa operaciones entre términos
-        Object resultado = evaluar(ctx.term(0));
-        for (int i = 1; i < ctx.term().size(); i++) {
-            Object siguiente = evaluar(ctx.term(i));
-            String operador = ctx.getChild(2 * i - 1).getText(); // PLUS o MINUS
+        if(is_identifier){
+            String  resultado = "";
 
-            if (operador.equals("+")) {
-                if (resultado instanceof Integer && siguiente instanceof Integer) {
-                    resultado = (Integer) resultado + (Integer) siguiente;
-                } else if (resultado instanceof String || siguiente instanceof String) {
-                    resultado = resultado.toString() + siguiente.toString();
-                }
-            } else if (operador.equals("-")) {
-                if (resultado instanceof Integer && siguiente instanceof Integer) {
-                    resultado = (Integer) resultado - (Integer) siguiente;
-                } else {
-                    throw new RuntimeException("Operación no válida para el operador '-'");
+            // Generar código para el primer término
+            resultado += ctx.term(0).accept(this);
+
+            // Si hay más términos, procesarlos con sus operadores
+            for (int i = 1; i < ctx.term().size(); i++) {
+                // Generar código para el siguiente término
+                resultado += ctx.term(i).accept(this);
+
+                // Obtener el operador entre los términos
+                String operador = ctx.getChild(2 * i - 1).getText(); // PLUS o MINUS
+
+                // Generar la instrucción correspondiente al operador
+                if (operador.equals("+")) {
+                    resultado += "    iadd\n"; // Suma
+                } else if (operador.equals("-")) {
+                    resultado += "    isub\n"; // Resta
                 }
             }
+
+            is_identifier = false;
+
+            return resultado;
+        } else {
+            if (ctx.term().size() == 1) {
+                // Si la expresión tiene un solo término, se evalúa directamente
+                return evaluar(ctx.term(0));
+            }
+
+            // Procesa operaciones entre términos
+            Object resultado = evaluar(ctx.term(0));
+            for (int i = 1; i < ctx.term().size(); i++) {
+                Object siguiente = evaluar(ctx.term(i));
+                String operador = ctx.getChild(2 * i - 1).getText(); // PLUS o MINUS
+
+                if (operador.equals("+")) {
+                    if (resultado instanceof Integer && siguiente instanceof Integer) {
+                        resultado = (Integer) resultado + (Integer) siguiente;
+                    } else if (resultado instanceof String || siguiente instanceof String) {
+                        resultado = resultado.toString() + siguiente.toString();
+                    }
+                } else if (operador.equals("-")) {
+                    if (resultado instanceof Integer && siguiente instanceof Integer) {
+                        resultado = (Integer) resultado - (Integer) siguiente;
+                    } else {
+                        throw new RuntimeException("Operación no válida para el operador '-'");
+                    }
+                }
+            }
+            return resultado;
         }
-        return resultado;
     }
 
     @Override
     public Object visitTerm(MiniBParser.TermContext ctx) {
-        if (ctx.factor().size() == 1) {
-            // Si el término tiene un solo factor, evalúalo directamente
-            return evaluar(ctx.factor(0));
-        }
+        if(is_identifier){
+            String resultado = "";
 
-        Object resultado = evaluar(ctx.factor(0));
-        for (int i = 1; i < ctx.factor().size(); i++) {
-            Object siguiente = evaluar(ctx.factor(i));
-            String operador = ctx.getChild(2 * i - 1).getText().toUpperCase(); // MULT, DIV, MOD
+            // Generar código para el primer factor
+            resultado += ctx.factor(0).accept(this);
 
-            if (operador.equals("*")) {
-                resultado = (Integer) resultado * (Integer) siguiente;
-            } else if (operador.equals("/")) {
-                resultado = (Integer) resultado / (Integer) siguiente;
-            } else if (operador.equals("%") || operador.equals("MOD")) {
-                resultado = (Integer) resultado % (Integer) siguiente;
+            // Si hay más factores, procesarlos con sus operadores
+            for (int i = 1; i < ctx.factor().size(); i++) {
+                // Generar código para el siguiente factor
+                resultado += ctx.factor(i).accept(this);
+
+                // Obtener el operador entre los factores
+                String operador = ctx.getChild(2 * i - 1).getText(); // MULT, DIV o MOD
+
+                // Generar la instrucción correspondiente al operador
+                switch (operador) {
+                    case "*":
+                        resultado += "    imul\n";
+                        break;
+                    case "/":
+                        resultado += "    idiv\n";
+                        break;
+                    case "%":
+                    case "MOD":
+                        resultado += "    irem\n";
+                        break;
+                }
             }
+            return resultado;
+
+        } else {
+            if (ctx.factor().size() == 1) {
+                // Si el término tiene un solo factor, evalúalo directamente
+                return evaluar(ctx.factor(0));
+            }
+
+            Object resultado = evaluar(ctx.factor(0));
+            for (int i = 1; i < ctx.factor().size(); i++) {
+                Object siguiente = evaluar(ctx.factor(i));
+                String operador = ctx.getChild(2 * i - 1).getText().toUpperCase(); // MULT, DIV, MOD
+
+                if (operador.equals("*")) {
+                    resultado = (Integer) resultado * (Integer) siguiente;
+                } else if (operador.equals("/")) {
+                    resultado = (Integer) resultado / (Integer) siguiente;
+                } else if (operador.equals("%") || operador.equals("MOD")) {
+                    resultado = (Integer) resultado % (Integer) siguiente;
+                }
+            }
+            return resultado;
         }
-        return resultado;
     }
 
     @Override
     public Object visitFactor(MiniBParser.FactorContext ctx) {
         if (ctx.NUMBER() != null) {
             // Procesa números
+            if(is_identifier)
+                return "   ldc " + Integer.parseInt((ctx.NUMBER().getText())) + "\n";
+
             return (Integer.parseInt((ctx.NUMBER().getText())));
         } else if (ctx.IDENTIFIER() != null) {
             // Procesa identificadores
@@ -136,36 +200,46 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     @Override
     public String visitLetStatement(MiniBParser.LetStatementContext ctx){
+        String resultado = "";
+
         // Obtener el identificador y la expresión
         String nombre = ctx.IDENTIFIER().getText();
 
-        // CORREGIR
-        Object valor = visitExpression(ctx.expression());
+        if(tablaSimbolos.buscarSimbolo(nombre) == null){ // Se esta asignando una variable nueva
+            Object valor = visitExpression(ctx.expression());
 
-        System.out.println(valor);
+            // Determinar el tipo del valor
+            String tipo;
+            if (valor instanceof Integer) {
+                tipo = "Integer";
+            } else if (valor instanceof String) {
+                tipo = "String";
+            } else if (valor instanceof Integer) {
+                tipo = "Integer";
+            } else {
+                throw new RuntimeException("Tipo desconocido para la variable: " + nombre);
+            }
 
-        // Determinar el tipo del valor
-        String tipo;
-        if (valor instanceof Integer) {
-            tipo = "Integer";
-        } else if (valor instanceof String) {
-            tipo = "String";
-        } else if (valor instanceof Integer){
-            tipo = "Integer";
+            Simbolo variable = new Simbolo(nombre, tipo, valor);
+
+            // IF auxiliar para no tener que modificar visitTerm y visitPrin
+            if (tipo == "String")
+                valor = "\"" + valor + "\"";
+
+            // Guardar o actualizar el valor en la tabla de símbolos
+            tablaSimbolos.agregarSimbolo(nombre, variable);
+            resultado += "    ldc " + valor + "\n"
+                      +  "    " + variable.asignar() + "\n\n";
         } else {
-            throw new RuntimeException("Tipo desconocido para la variable: " + nombre);
+            is_identifier = true;
+
+            Simbolo variable = tablaSimbolos.buscarSimbolo(nombre);
+
+            resultado += visitExpression(ctx.expression());
+
+            resultado += variable.asignar() + "\n";
+
         }
-
-        Simbolo variable = new Simbolo(nombre, tipo, valor);
-
-        // IF auxiliar para no tener que modificar visitTerm y visitPrin
-        if(tipo == "String")
-            valor = "\""+valor+"\"";
-
-        // Guardar o actualizar el valor en la tabla de símbolos
-        tablaSimbolos.agregarSimbolo(nombre, variable);
-        String resultado = "    ldc " + valor + "\n"
-                         + "    " + variable.asignar() + "\n\n";
 
 
         return resultado; // No devuelve nada, ya que es una declaración
@@ -185,7 +259,6 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         if(ctx.condition().children.contains(ctx.condition().logicalOp())){
             instrucciones += "\n" + visitCondition(ctx.condition().condition()) + etiquetaElse;
         }
-
 
         // Bloque THEN
         instrucciones += "    ; Bloque THEN\n";
@@ -315,6 +388,19 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
         contador_for++;
 
+        return resultado;
+    }
+
+    @Override
+    public Object visitWhileStatement(MiniBParser.WhileStatementContext ctx) {
+        String resultado = "WHILE_START_" + contador_while + ":\n";
+
+        resultado += visitCondition(ctx.condition()) + " WHILE_END_" + contador_while + "\n";
+        resultado += visitBloqueControl(ctx.bloqueControl());
+        resultado += "    goto WHILE_START_" + contador_while + "\n"
+                  +  "WHILE_END_" + contador_while + ": \n";
+
+        contador_while++;
         return resultado;
     }
 }
