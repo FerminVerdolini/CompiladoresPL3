@@ -1,4 +1,3 @@
-import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 public class MyVisitor extends MiniBParserBaseVisitor<Object> {
@@ -157,11 +156,19 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             throw new RuntimeException("Tipo desconocido para la variable: " + nombre);
         }
 
-        // Guardar o actualizar el valor en la tabla de símbolos
-        tablaSimbolos.agregarSimbolo(nombre, tipo, valor);
-        tablaSimbolos.imprimirTabla();
+        Simbolo variable = new Simbolo(nombre, tipo, valor);
 
-        return ""; // No devuelve nada, ya que es una declaración
+        // IF auxiliar para no tener que modificar visitTerm y visitPrin
+        if(tipo == "String")
+            valor = "\""+valor+"\"";
+
+        // Guardar o actualizar el valor en la tabla de símbolos
+        tablaSimbolos.agregarSimbolo(nombre, variable);
+        String resultado = "    ldc " + valor + "\n"
+                         + "    " + variable.asignar() + "\n\n";
+
+
+        return resultado; // No devuelve nada, ya que es una declaración
     }
 
     @Override
@@ -203,14 +210,31 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     public String visitCondition(MiniBParser.ConditionContext ctx){
 
         String instrucciones = "";
+        String exp1;
+        String exp2;
+
         if(ctx.expression().size() == 1) {
             // Evalua la expresion de una sola expresion (0, != 0 o Boolean)
             instrucciones += "    ldc " + visitExpression(ctx.expression(0)) + "\n";
             instrucciones += "    ifeq ";
         } else if (ctx.expression().size() == 2) {
             // Evalua la comparacion de dos expresiones
-            String exp1 = "    ldc " + visitExpression(ctx.expression(0)) + "\n";
-            String exp2 = "    ldc " + visitExpression(ctx.expression(1)) + "\n";
+
+            visitExpression(ctx.expression(0));
+            if(is_identifier){
+                exp1 = "    " + visitExpression(ctx.expression(0)) + "\n";
+                is_identifier = false;
+            } else {
+                exp1 = "    ldc " + visitExpression(ctx.expression(0)) + "\n";
+            }
+
+            visitExpression(ctx.expression(1));
+            if(is_identifier){
+                exp2 = "    " + visitExpression(ctx.expression(1)) + "\n";
+                is_identifier = false;
+            } else {
+                exp2 = "    ldc " + visitExpression(ctx.expression(1)) + "\n";
+            }
 
             instrucciones += exp2 + exp1;
 
@@ -256,7 +280,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         Simbolo indice = tablaSimbolos.buscarSimbolo(ctx.IDENTIFIER().getText());
 
         Integer indice_valor = (Integer) indice.getValor();
-        String indice_registro = indice.getRegistro();
+        String indice_registro = indice.asignar();
 
 
         resultado += "    ldc " + indice_valor + "        ; Cargar el valor inicial\n"

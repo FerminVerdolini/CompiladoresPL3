@@ -15,6 +15,14 @@ public class TablaSimbolos {
         }
     }
 
+    public void agregarSimbolo(String nombre, Simbolo simbolo){
+        if(tabla.containsKey(nombre)){
+            System.out.println("Error: La variable " + nombre + " ya está declarada.");
+        } else {
+            tabla.put(nombre, simbolo);
+        }
+    }
+
     public void actualizarValor(String nombre, String tipo, Object valor){
         if(tabla.containsKey(nombre)){
             tabla.get(nombre).setValor(valor);

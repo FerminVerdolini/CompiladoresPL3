@@ -5,6 +5,7 @@ public class Simbolo {
     private String[] registro = new String[2];
     private static Integer indice_int = 0;
     private static Integer indice_float = 0;
+    private static Integer indice_string = 0;
 
     public Simbolo(String nombre, String tipo, Object valor){
         this.nombre = nombre;
@@ -18,6 +19,10 @@ public class Simbolo {
         } else if(tipo.equals("Float")){
             this.registro[0] = "fstore_" + indice_float;
             this.registro[1] = "fload_" + indice_float;
+            indice_float++;
+        } else if(tipo.equals("String")){
+            this.registro[0] = "astore_" + indice_string;
+            this.registro[1] = "aload_" + indice_string;
             indice_float++;
         }
     }
@@ -46,7 +51,7 @@ public class Simbolo {
         this.valor = valor;
     }
 
-    public String getRegistro() { return this.registro[0]; }
+    public String asignar() { return this.registro[0]; }
 
     //public void setRegistro(String registro) { this.registro[0] = registro; }
 

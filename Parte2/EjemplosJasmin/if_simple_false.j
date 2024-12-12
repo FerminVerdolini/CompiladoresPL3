@@ -26,7 +26,7 @@ ELSE_BLOCK_1:
 END_BLOCK_1:
 
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "thre"
+    ldc "three"
     invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
 
 return
