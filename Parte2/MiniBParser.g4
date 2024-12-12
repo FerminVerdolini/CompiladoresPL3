@@ -13,6 +13,11 @@ statement: forStatement
          | inputStatement
          | letStatement
          | repeatStatement
+         | resizeArrayStatemen
+         | functionDeclaration
+         | subroutineDeclaration
+         | functionCall
+         | subroutineCall
          ;
 
 // Bucle FOR
@@ -36,6 +41,26 @@ letStatement: (LET)? IDENTIFIER EQUAL expression;
 // Declaración REPEAT-UNTIL
 repeatStatement: REPEAT statement+ UNTIL condition;
 
+resizeArrayStatemen: RESIZE LPAREN IDENTIFIER COMMA expression (COMMA expression)? RPAREN;
+
+// Declaración de función
+functionDeclaration: FUNCTION IDENTIFIER LPAREN parameterList? RPAREN bloqueControl RETURN expression END FUNCTION;
+
+// Declaración de subrutina
+subroutineDeclaration: SUB IDENTIFIER LPAREN parameterList? RPAREN bloqueControl END SUB;
+
+// Llamada a función
+functionCall: IDENTIFIER LPAREN argumentList? RPAREN;
+
+// Llamada a subrutina
+subroutineCall: CALL IDENTIFIER LPAREN argumentList? RPAREN;
+
+// Lista de parámetros
+parameterList: IDENTIFIER (COMMA IDENTIFIER)*;
+
+// Lista de argumentos
+argumentList: expression (COMMA expression)*;
+
 // Operadores Lógicos
 logicalOp: AND | OR | NOT;
 
@@ -47,9 +72,29 @@ condition: expression ((LT | LTE | GT | GTE | EQ | NEQ) expression)? (logicalOp 
 expression: term ((PLUS | MINUS) term)*;
 term: factor ((MULT | DIV | MOD) factor)*;
 factor: NUMBER
+      | FLOAT
       | IDENTIFIER
       | LPAREN expression RPAREN 
       | STRING
-      | VAL LPAREN expression RPAREN
-      | LEN LPAREN expression RPAREN
-      | ISNAN LPAREN expression RPAREN;
+      | CHAR
+      | boolean
+      | valFunc
+      | lenFunc
+      | isNanFunc
+      | copyFunct
+      | concatFunc
+      | subStringFunc
+      | charAtFunct
+      | arrayLiteral
+      | arrayAccess;
+      
+valFunc: VAL LPAREN expression RPAREN;
+lenFunc:LEN LPAREN expression RPAREN;
+isNanFunc:ISNAN LPAREN expression RPAREN;
+copyFunct:COPY LPAREN expression RPAREN;
+subStringFunc: SUBSTRING LPAREN expression COMMA expression COMMA expression RPAREN;
+concatFunc: CONCAT LPAREN expression (COMMA expression)+ RPAREN;
+charAtFunct: CHARAT LPAREN expression COMMA expression RPAREN;
+arrayLiteral: LBRACKET (expression (COMMA expression)*)? RBRACKET;
+arrayAccess: IDENTIFIER LBRACKET expression RBRACKET;
+boolean: TRUE | FALSE;
