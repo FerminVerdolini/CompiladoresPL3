@@ -2,4 +2,6 @@
 *.tokens
 *.class
 out/
+.antlr/
+
 
