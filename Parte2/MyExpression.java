@@ -1,7 +1,6 @@
 
 import enums.ExpOperations;
 import enums.FinalFactors;
-
 import java.util.List;
 
 public class MyExpression {
