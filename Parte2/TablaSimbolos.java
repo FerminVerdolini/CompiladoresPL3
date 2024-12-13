@@ -1,3 +1,5 @@
+import enums.FinalFactors;
+
 import java.util.HashMap;
 
 public class TablaSimbolos {

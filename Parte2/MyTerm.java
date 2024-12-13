@@ -1,3 +1,6 @@
+import enums.FinalFactors;
+import enums.TermOperations;
+
 import java.util.List;
 
 public class MyTerm {

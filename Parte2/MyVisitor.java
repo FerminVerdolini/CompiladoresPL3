@@ -2,6 +2,9 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+import enums.ExpOperations;
+import enums.FinalFactors;
+import enums.TermOperations;
 import org.antlr.v4.runtime.tree.*;
 
 public class MyVisitor extends MiniBParserBaseVisitor<Object> {
@@ -114,55 +117,21 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         String nombre = ctx.IDENTIFIER().getText();
         
         if(tablaSimbolos.buscarSimbolo(nombre) == null){ // Se esta asignando una variable nueva
-            Object valor = visitExpression(ctx.expression());
-
+            MyExpression valor = visitExpression(ctx.expression());
             // Determinar el tipo del valor
-            String tipo;
-            if (valor instanceof Integer) {
-                tipo = "Integer";
-            } else if (valor instanceof String) {
-                tipo = "String";
-            } else if (valor instanceof Integer) {
-                tipo = "Integer";
-            } else if (valor instanceof Character){
-                tipo = "Character";
-            } else if (valor instanceof Boolean){
-                tipo = "Boolean";
-            } else if (valor instanceof Array){
-                tipo = "Array";
-            } else {
-                throw new RuntimeException("Tipo desconocido para la variable: " + nombre);
-            }
-
-            //Simbolo variable = new Simbolo(nombre, tipo, valor);
-            
-            // IF auxiliar para no tener que modificar visitTerm y visitPrin
-            if (tipo.equals("String")){
-                valor = "\"" + valor + "\"";
-            }else if (tipo.equals("Character")) {
-                Character c = (char) valor;
-                valor = (int) c;
-            }
-
+            FinalFactors tipoenum = valor.getType();
+            Simbolo variable = new Simbolo(nombre, tipoenum, valor.evaluar());
             // Guardar o actualizar el valor en la tabla de símbolos
-        //     tablaSimbolos.agregarSimbolo(nombre, variable);
-        //     resultado += "    ldc " + valor + "\n"
-        //     +  "    " + variable.asignar() + "\n\n";
-        } else {
-                        is_identifier = true;
-
-                        Simbolo variable = tablaSimbolos.buscarSimbolo(nombre);
-                        
-                        resultado += visitExpression(ctx.expression());
-                        
-                        resultado += variable.asignar() + "\n";
-                        
-                        
-                        
-                    }
-
-
-                    return resultado; // No devuelve nada, ya que es una declaración
+            tablaSimbolos.agregarSimbolo(nombre, variable);
+            resultado += "    ldc " + variable.getValor() + "\n"
+            +  "    " + variable.asignar() + "\n\n";
+            } else {
+                is_identifier = true;
+                Simbolo variable = tablaSimbolos.buscarSimbolo(nombre);
+                resultado += visitExpression(ctx.expression());
+                resultado += variable.asignar() + "\n";
+            }
+            return resultado; // No devuelve nada, ya que es una declaración
     }
     
     @Override
@@ -275,7 +244,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         
         Integer limite = (Integer) evaluar(ctx.expression(1));
         
-       // tablaSimbolos.agregarSimbolo(ctx.IDENTIFIER().getText(), "Integer", evaluar(ctx.expression(0)));
+        tablaSimbolos.agregarSimbolo(ctx.IDENTIFIER().getText(), FinalFactors.NUMBER, evaluar(ctx.expression(0)));
         Simbolo indice = tablaSimbolos.buscarSimbolo(ctx.IDENTIFIER().getText());
         
         Integer indice_valor = (Integer) indice.getValor();
@@ -399,7 +368,6 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return term;
     }
     
-
     @Override
     public MyFactor visitNumb(MiniBParser.NumbContext ctx){
         MyFactor num = new MyFactor(Integer.parseInt((ctx.NUMBER().getText())),FinalFactors.NUMBER);
@@ -432,7 +400,6 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         MyFactor ch = new MyFactor(ctx.CHAR().getText().charAt(1),FinalFactors.CHAR);
         return ch;  
     }
-
 
     @Override
     public MyFactor visitCadena(MiniBParser.CadenaContext ctx){
