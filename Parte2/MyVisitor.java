@@ -39,196 +39,216 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return instrucciones;
     }
 
+    
     @Override
     public String visitPrintStatement(MiniBParser.PrintStatementContext ctx){
         String instrucciones = "\n    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
         MyExpression exp = ((MyExpression)visit(ctx.expression()));
         if(exp.getHadIdentifier()){
-            
+            instrucciones += evaluarExprOnJasmin(exp);
+            switch (exp.type) {
+                case NUMBER:
+                instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+                break;
+                case FLOAT:
+                instrucciones += "\n    invokevirtual java/io/PrintStream/println(F)V\n";    
+                break;
+                case CHAR:
+                instrucciones += "\n    invokevirtual java/io/PrintStream/println(C)V\n";
+                break;
+                case STRING:
+                instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+                break;
+                case BOOLEAN:
+                instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+                break;
+                //TODO ver c omo imprimir los arrays
+                
+            }
         }else{
             Object resultado = exp.evaluar();
             instrucciones += "    ldc ";
             switch (exp.type) {
                 case NUMBER:
-                    instrucciones += resultado;
-                    instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
-                    break;
+                instrucciones += resultado;
+                instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+                break;
                 case FLOAT:
-                    instrucciones += resultado;
-                    instrucciones += "\n    invokevirtual java/io/PrintStream/println(F)V\n";    
-                    break;
+                instrucciones += resultado;
+                instrucciones += "\n    invokevirtual java/io/PrintStream/println(F)V\n";    
+                break;
                 case CHAR:
-                    instrucciones += (Integer)resultado;
-                    instrucciones += "\n    invokevirtual java/io/PrintStream/println(C)V\n";
-                    break;
+                instrucciones += (Integer)resultado;
+                instrucciones += "\n    invokevirtual java/io/PrintStream/println(C)V\n";
+                break;
                 case STRING:
-                    instrucciones += "\"" + resultado + "\"";
-                    instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
-                    break;
+                instrucciones += "\"" + resultado + "\"";
+                instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+                break;
                 case BOOLEAN:
-                    instrucciones += "\"" + resultado.toString() + "\"";
-                    instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
-                    break;
+                instrucciones += "\"" + resultado.toString() + "\"";
+                instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+                break;
                 //TODO ver c omo imprimir los arrays
-
+                
             }
         }
         // Object expression = evaluar(ctx.expression(0));
         
         // if(is_identifier){
-        //     is_identifier = false;
-        //     instrucciones += tablaSimbolos.buscarSimbolo(expression.toString()).cargarEnPila();
+            //     is_identifier = false;
+            //     instrucciones += tablaSimbolos.buscarSimbolo(expression.toString()).cargarEnPila();
             
-        //     String tipo = tablaSimbolos.buscarSimbolo(expression.toString()).getTipo();            
-        //     switch (tipo) {
-        //         case "String":
-        //         instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
-        //         break;
-        //         case "Integer":
-        //         instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
-        //         break;
-        //         case "Character":    
-        //         instrucciones += "\n    invokevirtual java/io/PrintStream/println(C)V\n";
-        //         break;
-        //         default:
-        //         break;
-        //     }            
-        // } else if(expression instanceof String){
-        //     instrucciones += "    ldc ";
-        //     // Si la expresion es String llama a la funcion y lo evalua entre comillas
-        //     instrucciones += "\"" + expression + "\"";
-        //     instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
-
-        // } else if (expression instanceof Integer) {
-        //     instrucciones += "    ldc ";
-        //     // Si la expresion es Integer llama a la funcion correspondiente para imprimir enteros
-        //     instrucciones += expression;
-        //     instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
-        // }
-
-        return instrucciones;
-    }
-
-    @Override
-    public String visitLetStatement(MiniBParser.LetStatementContext ctx){
-        String resultado = "";
-
-        // Obtener el identificador y la expresión
-        String nombre = ctx.IDENTIFIER().getText();
-        
-        if(tablaSimbolos.buscarSimbolo(nombre) == null){ // Se esta asignando una variable nueva
-            MyExpression valor = visitExpression(ctx.expression());
-            // Determinar el tipo del valor
-            FinalFactors tipoenum = valor.getType();
-            Simbolo variable = new Simbolo(nombre, tipoenum, valor.evaluar());
-            // Guardar o actualizar el valor en la tabla de símbolos
-            tablaSimbolos.agregarSimbolo(nombre, variable);
-            resultado += "    ldc " + variable.getValor() + "\n"
-            +  "    " + variable.asignar() + "\n\n";
-            } else {
-                is_identifier = true;
+            //     String tipo = tablaSimbolos.buscarSimbolo(expression.toString()).getTipo();            
+            //     switch (tipo) {
+                //         case "String":
+                //         instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+                //         break;
+                //         case "Integer":
+                //         instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+                //         break;
+                //         case "Character":    
+                //         instrucciones += "\n    invokevirtual java/io/PrintStream/println(C)V\n";
+                //         break;
+                //         default:
+                //         break;
+                //     }            
+                // } else if(expression instanceof String){
+                    //     instrucciones += "    ldc ";
+                    //     // Si la expresion es String llama a la funcion y lo evalua entre comillas
+                    //     instrucciones += "\"" + expression + "\"";
+                    //     instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+                    
+                    // } else if (expression instanceof Integer) {
+                        //     instrucciones += "    ldc ";
+                        //     // Si la expresion es Integer llama a la funcion correspondiente para imprimir enteros
+                        //     instrucciones += expression;
+                        //     instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+                        // }
+                        
+                        return instrucciones;
+                    }
+                    
+                    @Override
+                    public String visitLetStatement(MiniBParser.LetStatementContext ctx){
+                        String resultado = "";
+                        
+                        // Obtener el identificador y la expresión
+                        String nombre = ctx.IDENTIFIER().getText();
+                        
+                        if(tablaSimbolos.buscarSimbolo(nombre) == null){ // Se esta asignando una variable nueva
+                            MyExpression valor = visitExpression(ctx.expression());
+                            // Determinar el tipo del valor
+                            FinalFactors tipoenum = valor.getType();
+                            Simbolo variable = new Simbolo(nombre, tipoenum, valor.evaluar());
+                            // Guardar o actualizar el valor en la tabla de símbolos
+                            tablaSimbolos.agregarSimbolo(nombre, variable);
+                            resultado += "    ldc " + variable.getValor() + "\n"
+                            +  "    " + variable.asignar() + "\n\n";
+                        } else {
+                            is_identifier = true;
                 Simbolo variable = tablaSimbolos.buscarSimbolo(nombre);
                 resultado += visitExpression(ctx.expression());
                 resultado += variable.asignar() + "\n";
             }
             return resultado; // No devuelve nada, ya que es una declaración
-    }
-    
-    @Override
-    public String visitIfStatement(MiniBParser.IfStatementContext ctx) {
-
-        // Generar etiquetas únicas
-        String etiquetaElse = "ELSE_BLOCK_" + contador_if;
-        String etiquetaFin = "END_BLOCK_" + contador_if;
-        contador_if++;
-        
-        // Evaluar la condición
-        String instrucciones = visitCondition(ctx.condition()) + etiquetaElse;
-        
-        if(ctx.condition().children.contains(ctx.condition().logicalOp())){
-            instrucciones += "\n" + visitCondition(ctx.condition().condition()) + etiquetaElse;
-        }
-
-        // Bloque THEN
-        instrucciones += "    ; Bloque THEN\n";
-        instrucciones += visitBloqueControl(ctx.bloqueControl(0));
-        instrucciones += "    goto " + etiquetaFin + "\n";  // Saltar al final del bloque
-        
-        
-        // Bloque ELSE
-        instrucciones += etiquetaElse + ":\n";
-        if (ctx.bloqueControl(1) != null) {
-            instrucciones += "    ; Bloque ELSE\n";
-            instrucciones += visitBloqueControl(ctx.bloqueControl(1));
         }
         
-        // Etiqueta de fin
-        instrucciones += etiquetaFin + ":\n";
-        
-        return instrucciones;
-    }
-    
-    @Override
-    public String visitCondition(MiniBParser.ConditionContext ctx){
-        
-        String instrucciones = "";
-        String exp1;
-        String exp2;
-        
-        if(ctx.expression().size() == 1) {
-            // Evalua la expresion de una sola expresion (0, != 0 o Boolean)
-            instrucciones += "    ldc " + visitExpression(ctx.expression(0)) + "\n";
-            instrucciones += "    ifeq ";
-        } else if (ctx.expression().size() == 2) {
-            // Evalua la comparacion de dos expresiones
+        @Override
+        public String visitIfStatement(MiniBParser.IfStatementContext ctx) {
             
-            visitExpression(ctx.expression(0));
-            if(is_identifier){
-                exp1 = "    " + visitExpression(ctx.expression(0)) + "\n";
-                is_identifier = false;
-            } else {
-                exp1 = "    ldc " + visitExpression(ctx.expression(0)) + "\n";
+            // Generar etiquetas únicas
+            String etiquetaElse = "ELSE_BLOCK_" + contador_if;
+            String etiquetaFin = "END_BLOCK_" + contador_if;
+            contador_if++;
+            
+            // Evaluar la condición
+            String instrucciones = visitCondition(ctx.condition()) + etiquetaElse;
+            
+            if(ctx.condition().children.contains(ctx.condition().logicalOp())){
+                instrucciones += "\n" + visitCondition(ctx.condition().condition()) + etiquetaElse;
             }
             
-            visitExpression(ctx.expression(1));
-            if(is_identifier){
-                exp2 = "    " + visitExpression(ctx.expression(1)) + "\n";
-                is_identifier = false;
-            } else {
-                exp2 = "    ldc " + visitExpression(ctx.expression(1)) + "\n";
+            // Bloque THEN
+            instrucciones += "    ; Bloque THEN\n";
+            instrucciones += visitBloqueControl(ctx.bloqueControl(0));
+            instrucciones += "    goto " + etiquetaFin + "\n";  // Saltar al final del bloque
+            
+            
+            // Bloque ELSE
+            instrucciones += etiquetaElse + ":\n";
+            if (ctx.bloqueControl(1) != null) {
+                instrucciones += "    ; Bloque ELSE\n";
+                instrucciones += visitBloqueControl(ctx.bloqueControl(1));
             }
             
-            instrucciones += exp2 + exp1;
+            // Etiqueta de fin
+            instrucciones += etiquetaFin + ":\n";
             
-            String operador = ctx.getChild(1).getText();
+            return instrucciones;
+        }
+        
+        @Override
+        public String visitCondition(MiniBParser.ConditionContext ctx){
             
-            switch (operador) {
-                case "<":
-                instrucciones += "    if_icmplt "; break;
-                case "<=":
+            String instrucciones = "";
+            String exp1;
+            String exp2;
+            
+            if(ctx.expression().size() == 1) {
+                // Evalua la expresion de una sola expresion (0, != 0 o Boolean)
+                instrucciones += "    ldc " + visitExpression(ctx.expression(0)) + "\n";
+                instrucciones += "    ifeq ";
+            } else if (ctx.expression().size() == 2) {
+                // Evalua la comparacion de dos expresiones
+                
+                visitExpression(ctx.expression(0));
+                if(is_identifier){
+                    exp1 = "    " + visitExpression(ctx.expression(0)) + "\n";
+                    is_identifier = false;
+                } else {
+                    exp1 = "    ldc " + visitExpression(ctx.expression(0)) + "\n";
+                }
+                
+                visitExpression(ctx.expression(1));
+                if(is_identifier){
+                    exp2 = "    " + visitExpression(ctx.expression(1)) + "\n";
+                    is_identifier = false;
+                } else {
+                    exp2 = "    ldc " + visitExpression(ctx.expression(1)) + "\n";
+                }
+                
+                instrucciones += exp2 + exp1;
+                
+                String operador = ctx.getChild(1).getText();
+                
+                switch (operador) {
+                    case "<":
+                    instrucciones += "    if_icmplt "; break;
+                    case "<=":
                     instrucciones += "    if_icmple "; break;
                     case ">":
                     instrucciones += "    if_icmpgt "; break;
-                case ">=":
+                    case ">=":
                     instrucciones += "    if_icmpge "; break;
-                case "==":
-                instrucciones += "    if_icmpeq "; break;
-                case "!=":
-                instrucciones += "    if_icmpne "; break;
-                default:
-                throw new RuntimeException("Operador desconocido: " + operador);
+                    case "==":
+                    instrucciones += "    if_icmpeq "; break;
+                    case "!=":
+                    instrucciones += "    if_icmpne "; break;
+                    default:
+                    throw new RuntimeException("Operador desconocido: " + operador);
+                }
             }
+            
+            return instrucciones;
         }
         
-        return instrucciones;
-    }
-    
-    @Override
-    public String visitBloqueControl(MiniBParser.BloqueControlContext ctx) {
-        StringBuilder instrucciones = new StringBuilder();
-        for (MiniBParser.StatementContext statement : ctx.statement()) {
-            instrucciones.append(statement.accept(this));
-        }
+        @Override
+        public String visitBloqueControl(MiniBParser.BloqueControlContext ctx) {
+            StringBuilder instrucciones = new StringBuilder();
+            for (MiniBParser.StatementContext statement : ctx.statement()) {
+                instrucciones.append(statement.accept(this));
+            }
         if(ctx.CONTINUE() != null)
         instrucciones.append("    goto INCREMENTAR\n");
         
@@ -292,18 +312,18 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         contador_while++;
         return resultado;
     }
-
+    
     @Override
     public MyExpression visitExpression(MiniBParser.ExpressionContext ctx) {
         List<MyTerm> terms = new ArrayList<>();
         List<ExpOperations> operations = new ArrayList<>();
         FinalFactors type = FinalFactors.NULL;
         Boolean hadIdentifier = false;
-
+        
         MyTerm term;     
         for (int i = 0; i < ctx.term().size(); i++){
             term = (MyTerm)visit(ctx.term(i));
-
+            
             if(term.getHadIdentifier()){
                 hadIdentifier=true;   
             }
@@ -314,19 +334,19 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 if(type != term.getType()){
                     //TODO lanzar exepcion
                 }
-            
+                
             }
             terms.add(term);
         }
-
+        
         for (int i = 0; i < ctx.expOperations().size(); i++){
             operations.add((ExpOperations)visit(ctx.expOperations(i)));
         }
-
+        
         MyExpression exp = new MyExpression(terms,operations,type,hadIdentifier);
         return exp;
     }
-
+    
     @Override
     public MyTerm visitTerm(MiniBParser.TermContext ctx) {
         List<MyFactor> factors = new ArrayList<>();
@@ -334,7 +354,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         FinalFactors type = FinalFactors.NULL;
         MyFactor fact;
         Boolean hadIdentifier = false;
-
+        
         
         for (int i = 0; i < ctx.factor().size(); i++){
             fact = (MyFactor)visit(ctx.factor(i));
@@ -348,7 +368,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             }else{
                 if(fact.getType().equals(FinalFactors.IDENTIFIER)){
                     if(type != tablaSimbolos.buscarSimbolo(fact.getValue().toString()).getTipo()){
-                       // TODO lanzar excepcion     
+                        // TODO lanzar excepcion     
                     }
                     hadIdentifier = true;     
                 }else{
@@ -359,11 +379,11 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             }
             factors.add(fact);
         }
-
+        
         for (int i = 0; i < ctx.factorOperations().size(); i++){
             operations.add((TermOperations)visit(ctx.factorOperations(i)));
         }
-
+        
         MyTerm term = new MyTerm(factors,operations,type,hadIdentifier);
         return term;
     }
@@ -380,7 +400,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         MyFactor fl = new MyFactor(Float.parseFloat((ctx.FLOAT().getText())),FinalFactors.FLOAT);
         return fl;  
     }
-
+    
     @Override
     public MyFactor visitIdent(MiniBParser.IdentContext ctx){
         // Procesa identificadores
@@ -394,13 +414,13 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         
         return id;        
     }
-
+    
     @Override
     public MyFactor visitCar(MiniBParser.CarContext ctx){
         MyFactor ch = new MyFactor(ctx.CHAR().getText().charAt(1),FinalFactors.CHAR);
         return ch;  
     }
-
+    
     @Override
     public MyFactor visitCadena(MiniBParser.CadenaContext ctx){
         MyFactor ch = new MyFactor(ctx.STRING().getText().replace("\"", ""),FinalFactors.STRING);
@@ -411,7 +431,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     public Object visitParent(MiniBParser.ParentContext ctx){
         return visit(ctx.expression());
     }
-
+    
     @Override
     public MyFactor visitBool(MiniBParser.BoolContext ctx){
         MyFactor bl = new MyFactor(ctx.boolean_().getText(),FinalFactors.BOOLEAN);
@@ -441,9 +461,143 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return ExpOperations.MINUS;
     }
     
+    private String evaluarExprOnJasmin(MyExpression exp){
+        String instrucciones = "";
+        Boolean isFirst = true;
+        for (int i = 0; i < exp.getTerms().size(); i++) {
+                switch (exp.getTerms().get(i).getfactors().get(0).getType()) {
+                    case NUMBER:
+                        instrucciones += "    ldc ";
+                        instrucciones += exp.getTerms().get(i).getfactors().get(0).getValue();
+                        break;
+                    case FLOAT:
+                        instrucciones += "    ldc ";
+                        instrucciones += exp.getTerms().get(i).getfactors().get(0).getValue();
+                        break;
+                    case CHAR:
+                        instrucciones += "    ldc ";
+                        instrucciones += (Integer)exp.getTerms().get(i).getfactors().get(0).getValue();
+                        break;
+                    case STRING:
+                        instrucciones += "    ldc ";    
+                        instrucciones += "\"" + exp.getTerms().get(i).getfactors().get(0).getValue() + "\"";
+                        break;
+                    case BOOLEAN:
+                        instrucciones += "    ldc ";
+                        instrucciones += "\"" + exp.getTerms().get(i).getfactors().get(0).getValue().toString() + "\"";
+                        break;
+                    case IDENTIFIER:
+                        instrucciones += "    "+tablaSimbolos.buscarSimbolo((String)exp.getTerms().get(i).getfactors().get(0).getValue()).cargarEnPila();
+                        break;    
+                }
+                instrucciones += "\n";
+            
+            if(!isFirst){
+                
+                switch (exp.getOperations().get(i-1)) {
+                    case PLUS:
+                    instrucciones += "    iadd\n";
+                    break;
+                    case MINUS:
+                    instrucciones += "    isub\n";
+                    break;
+                }
+            }else{
+                isFirst = false;
+            }
+        
+        }
+        
+        return instrucciones;   
+    }
+
+    // private String evaluarExprOnJasmin(MyExpression exp){
+    //     String instrucciones = "";
+    //     Boolean isFirst = true;
+    //     List<Simbolo> auxList = new ArrayList<>();
+    //     for (int i = 0; i < exp.getTerms().size(); i++) {
+    //         for (int j = 0; j < exp.getTerms().get(i).getfactors().size(); j++) {
+                
+                
+    //             switch (exp.getTerms().get(i).getfactors().get(j).getType()) {
+    //                 case NUMBER:
+    //                     instrucciones += "    ldc ";
+    //                     instrucciones += exp.getTerms().get(i).getfactors().get(j).getValue();
+    //                     break;
+    //                 case FLOAT:
+    //                     instrucciones += "    ldc ";
+    //                     instrucciones += exp.getTerms().get(i).getfactors().get(j).getValue();
+    //                     break;
+    //                 case CHAR:
+    //                     instrucciones += "    ldc ";
+    //                     instrucciones += (Integer)exp.getTerms().get(i).getfactors().get(j).getValue();
+    //                     break;
+    //                 case STRING:
+    //                     instrucciones += "    ldc ";    
+    //                     instrucciones += "\"" + exp.getTerms().get(i).getfactors().get(j).getValue() + "\"";
+    //                     break;
+    //                 case BOOLEAN:
+    //                     instrucciones += "    ldc ";
+    //                     instrucciones += "\"" + exp.getTerms().get(i).getfactors().get(j).getValue().toString() + "\"";
+    //                     break;
+    //                 case IDENTIFIER:
+    //                     instrucciones += "    "+tablaSimbolos.buscarSimbolo((String)exp.getTerms().get(i).getfactors().get(j).getValue()).cargarEnPila();
+    //                     break;    
+    //             }
+    //             //TODO ver c omo imprimir los arrays
+    //             instrucciones += "\n";
+
+    //             if(!isFirst){
+    //                 switch (exp.getTerms().get(i).getOperations().get(j-1)) {
+    //                     case MULT:
+    //                         instrucciones += "    imul\n";
+    //                         break;
+    //                     case DIV:
+    //                         instrucciones += "    idiv\n";
+    //                         break;
+    //                     case MOD:
+    //                         instrucciones += "    irem\n";
+    //                         break;
+    //                     }
+    //             }else{
+    //                 isFirst = false;
+    //             }
+    //         }
+            
+    //             Simbolo sim = new Simbolo("Aux"+i,exp.getType(),null);
+    //             instrucciones += "    " + sim.asignar()+ "\n";
+    //             auxList.add(sim);
+            
+    //         isFirst = true;
+    //     }
+
+    //     System.out.println("llega");
+
+    //     for (int i = 0; i < exp.getTerms().size(); i++) {
+    //         instrucciones += "    " + auxList.get(i).cargarEnPila() +"\n";
+    //         if(!isFirst){
+
+    //             switch (exp.getOperations().get(i-1)) {
+    //                 case PLUS:
+    //                     instrucciones += "    iadd\n";
+    //                     break;
+    //                 case MINUS:
+    //                     instrucciones += "    isub\n";
+    //                     break;
+    //             }
+    //         }else{
+    //             isFirst = false;
+    //         }
+    //     }
+        
+    //     return instrucciones;   
+    // }
+
+ 
+
     // @Override
     // public List<MyFactor> visitTerm(MiniBParser.TermContext ctx) {
-    //     Lis
+        //     Lis
     
     //     Object resultado = evaluar(ctx.factor(0));
     
