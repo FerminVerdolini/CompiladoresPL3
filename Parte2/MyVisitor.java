@@ -19,6 +19,9 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return tree.accept(this);
     }
 
+
+
+
     @Override
     public Object visitPrograma(MiniBParser.ProgramaContext ctx) {
         String instrucciones = ".class public " + file_name + "\n" +
@@ -124,6 +127,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     public Object visitTerm(MiniBParser.TermContext ctx) {
         if(is_identifier){
             String resultado = "";
+
 
             // Generar código para el primer factor
             resultado += ctx.factor(0).accept(this);
@@ -232,6 +236,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
         // Obtener el identificador y la expresión
         String nombre = ctx.IDENTIFIER().getText();
+
 
         if(tablaSimbolos.buscarSimbolo(nombre) == null){ // Se esta asignando una variable nueva
             Object valor = visitExpression(ctx.expression());

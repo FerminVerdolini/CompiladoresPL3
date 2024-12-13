@@ -979,6 +979,7 @@ public class MiniBParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class ExpressionContext extends ParserRuleContext {
+		public TermContext term2;
 		public List<TermContext> term() {
 			return getRuleContexts(TermContext.class);
 		}
@@ -1040,7 +1041,7 @@ public class MiniBParser extends Parser {
 						consume();
 					}
 					setState(120);
-					term();
+					((ExpressionContext)_localctx).term2 = term();
 					}
 					} 
 				}
@@ -1063,6 +1064,7 @@ public class MiniBParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class TermContext extends ParserRuleContext {
+		public FactorContext fac2;
 		public List<FactorContext> factor() {
 			return getRuleContexts(FactorContext.class);
 		}
@@ -1126,7 +1128,7 @@ public class MiniBParser extends Parser {
 					consume();
 				}
 				setState(128);
-				factor();
+				((TermContext)_localctx).fac2 = factor();
 				}
 				}
 				setState(133);

@@ -44,8 +44,8 @@ bloqueControl: (statement+ | CONTINUE | EXIT);
 
 // Expresiones y condiciones
 condition: expression ((LT | LTE | GT | GTE | EQ | NEQ) expression)? (logicalOp condition)?;
-expression: term ((PLUS | MINUS) term)*;
-term: factor ((MULT | DIV | MOD) factor)*;
+expression: term ((PLUS | MINUS) term2=term)*;
+term: factor ((MULT | DIV | MOD) fac2=factor)*;
 factor: NUMBER                          #Numb
       | IDENTIFIER                      #Ident
       | LPAREN expression RPAREN        #Parent
