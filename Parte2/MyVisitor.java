@@ -1,5 +1,7 @@
 import org.antlr.v4.runtime.tree.*;
 
+import java.util.ArrayList;
+
 public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     TablaSimbolos tablaSimbolos = new TablaSimbolos();
@@ -187,6 +189,11 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitFlotante(MiniBParser.FlotanteContext ctx) {
+        return Float.valueOf(ctx.FLOAT().getText());
+    }
+
+    @Override
     public Object visitIdent(MiniBParser.IdentContext ctx) {
         String nombre = ctx.IDENTIFIER().getText();
         Simbolo simbolo = tablaSimbolos.buscarSimbolo(nombre);
@@ -208,8 +215,21 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitCar(MiniBParser.CarContext ctx){
+        return ctx.CHAR().getText();
+    }
+
+    @Override
+    public Object visitBool(MiniBParser.BoolContext ctx){
+        if(ctx.boolean_().FALSE() != null)
+            return 0;
+        else
+            return 1;
+    }
+
+    @Override
     public Object visitVal(MiniBParser.ValContext ctx) {
-        String str_aux = (String) evaluar(ctx.expression());
+        String str_aux = (String) evaluar(ctx.valFunc().expression());
         try {
             Integer.parseInt(str_aux);
             return str_aux;
@@ -220,15 +240,91 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     @Override
     public Object visitLen(MiniBParser.LenContext ctx) {
-        String aux = (String) evaluar(ctx.expression());
+        String aux = (String) evaluar(ctx.lenFunc().expression());
         return String.valueOf(aux.length());
     }
 
     @Override
     public Object visitIsnan(MiniBParser.IsnanContext ctx) {
-        String aux = (String) evaluar(ctx.expression());
+        String aux = (String) evaluar(ctx.isNanFunc().expression());
         return aux.equals("NaN") ? "true" : "false";
     }
+
+    @Override
+    public Object visitCopy(MiniBParser.CopyContext ctx) {
+        return visitExpression(ctx.copyFunct().expression());
+    }
+
+    @Override
+    public Object visitConcat(MiniBParser.ConcatContext ctx){
+        String aux = "";
+        for(int i=0; i<ctx.concatFunc().expression().size(); i++){
+            aux += visitExpression(ctx.concatFunc().expression(i)).toString();
+        }
+        return aux;
+    }
+
+    @Override
+    public Object visitSubStr(MiniBParser.SubStrContext ctx) {
+        String aux = (String) evaluar(ctx.subStringFunc().expression(0));
+        Integer start = (Integer) evaluar(ctx.subStringFunc().expression(1));
+        Integer size = (Integer) evaluar(ctx.subStringFunc().expression(2));
+
+        return aux.substring(start, start + size);
+    }
+
+    @Override
+    public Object visitCharAt(MiniBParser.CharAtContext ctx){
+        String aux = (String) evaluar(ctx.charAtFunct().expression(0));
+        int index = (Integer) evaluar(ctx.charAtFunct().expression(1));
+        return aux.charAt(index);
+    }
+
+    @Override
+    public Object visitArrayLit(MiniBParser.ArrayLitContext ctx){
+        //Obtiene el tipo de la primer expresion
+        Object tipo = visitExpression(ctx.arrayLiteral().expression(0));
+
+        // Segun el tipo que sea crea el arreglo de ese tipo de objeto y lo devuelve
+        if(tipo instanceof Integer) {
+            ArrayList<Integer> arreglo = new ArrayList<>();
+            for(int i=0; i<ctx.arrayLiteral().expression().size(); i++){
+                arreglo.add((Integer)visitExpression(ctx.arrayLiteral().expression(i)));
+            }
+            return arreglo;
+        }
+        else if (tipo instanceof Float) {
+            ArrayList<Float> arreglo = new ArrayList<>();
+            for(int i=0; i<ctx.arrayLiteral().expression().size(); i++){
+                arreglo.add((Float) visitExpression(ctx.arrayLiteral().expression(i)));
+            }
+            return arreglo;
+        }
+        else if (tipo instanceof Character) {
+            ArrayList<Character> arreglo = new ArrayList<>();
+            for(int i=0; i<ctx.arrayLiteral().expression().size(); i++){
+                arreglo.add((Character) visitExpression(ctx.arrayLiteral().expression(i)));
+            }
+            return arreglo;
+        }
+        else { //String como opcion por defecto
+            ArrayList<String> arreglo = new ArrayList<>();
+            for(int i=0; i<ctx.arrayLiteral().expression().size(); i++){
+                arreglo.add((String) visitExpression(ctx.arrayLiteral().expression(i)));
+            }
+            return arreglo;
+        }
+    }
+
+    // **********************************************************************************
+    // Primero implementar manejo de arrays en tabla de simbolos para acceder al indice
+    // **********************************************************************************
+    @Override
+    public Object visitArrayAcc(MiniBParser.ArrayAccContext ctx){
+        return "";
+    }
+    // **********************************************************************************
+
 
     @Override
     public String visitLetStatement(MiniBParser.LetStatementContext ctx){
@@ -319,9 +415,16 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         String exp1;
         String exp2;
 
+        // Evaluo para levantar flag
+        evaluar(ctx.expression(0));
+
         if(ctx.expression().size() == 1) {
             // Evalua la expresion de una sola expresion (0, != 0 o Boolean)
-            instrucciones += "    ldc " + visitExpression(ctx.expression(0)) + "\n";
+            if(is_identifier){
+                instrucciones += "    " + visitExpression(ctx.expression(0)) + "\n";
+            } else{
+                instrucciones += "    ldc " + visitExpression(ctx.expression(0)) + "\n";
+            }
             instrucciones += "    ifeq ";
         } else if (ctx.expression().size() == 2) {
             // Evalua la comparacion de dos expresiones

@@ -23,7 +23,7 @@ public class Simbolo {
         } else if(tipo.equals("String")){
             this.registro[0] = "astore_" + indice_string;
             this.registro[1] = "aload_" + indice_string;
-            indice_float++;
+            indice_string++;
         }
     }
 

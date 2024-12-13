@@ -1,4 +1,4 @@
-// Generated from MiniBLexer.g4 by ANTLR 4.13.2
+// Generated from C:/Users/emanu/Escritorio/UAH/Compiladores/PL3/CompiladoresPL3/Parte2/MiniBLexer.g4 by ANTLR 4.13.2
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

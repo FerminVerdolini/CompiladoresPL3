@@ -23,6 +23,19 @@ UNTIL:    [uU] [nN] [tT] [iI] [lL];
 VAL:   [vV] [aA] [lL];
 LEN:   [lL] [eE] [nN];
 ISNAN: [iI] [sS] [nN] [aA] [nN];
+COPY:      [cC] [oO] [pP] [yY];
+CONCAT:    [cC] [oO] [nN] [cC] [aA] [tT];
+SUBSTRING: [sS] [uU] [bB] [sS] [tT] [rR] [iI] [nN] [gG];
+CHARAT:    [cC] [hH] [aA] [rR] [aA] [tT];
+RESIZE:    [rR] [eE] [sS] [iI] [zZ] [eE];
+
+//funciones y subrutinas
+FUNCTION: [fF] [uU] [nN] [cC] [tT] [iI] [oO] [nN];
+RETURN:   [rR] [eE] [tT] [uU] [rR] [nN];
+SUB:      [sS] [uU] [bB];
+CALL:     [cC] [aA] [lL] [lL];
+
+
 
 // Operadores y símbolos
 EQUAL: '=';
@@ -38,16 +51,22 @@ EQ: '==';
 NEQ: '!=';
 LPAREN: '(';
 RPAREN: ')';
+LBRACKET: '[';
+RBRACKET: ']';
 COMMA: ',';
 QUOTE: '"';
 AND: [Aa] [Nn] [Dd];
 OR: [Oo] [Rr];
 NOT: [Nn] [Oo] [Tt];
+TRUE:  [tT] [rR] [uU] [eE];
+FALSE: [fF] [aA] [lL] [sS] [eE];
 
 // Identificadores y literales
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*; // Identificadores
-NUMBER: [0-9]+;                    // Números enteros
+NUMBER: (PLUS | MINUS)? [0-9]+;                    // Números enteros
 STRING: '"' .*? '"';                // Cadenas
+CHAR: '\'' . '\'';  // caracter
+FLOAT: (PLUS | MINUS)? [0-9]+ '.' [0-9]+;  // Flotantes
 
 // Ignorar espacios y saltos de línea
 WS: [ \t\r\n]+ -> skip;             
