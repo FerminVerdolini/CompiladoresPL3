@@ -81,7 +81,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 instrucciones += "\n    invokevirtual java/io/PrintStream/println(C)V\n";
                 break;
                 case STRING:
-                instrucciones += "\"" + resultado + "\"";
+                instrucciones += (String)  resultado;
                 instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
                 break;
                 case BOOLEAN:
@@ -128,24 +128,24 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                         return instrucciones;
                     }
                     
-                    @Override
-                    public String visitLetStatement(MiniBParser.LetStatementContext ctx){
-                        String resultado = "";
-                        
-                        // Obtener el identificador y la expresión
-                        String nombre = ctx.IDENTIFIER().getText();
-                        
-                        if(tablaSimbolos.buscarSimbolo(nombre) == null){ // Se esta asignando una variable nueva
-                            MyExpression valor = visitExpression(ctx.expression());
-                            // Determinar el tipo del valor
-                            FinalFactors tipoenum = valor.getType();
-                            Simbolo variable = new Simbolo(nombre, tipoenum, valor.evaluar());
-                            // Guardar o actualizar el valor en la tabla de símbolos
-                            tablaSimbolos.agregarSimbolo(nombre, variable);
-                            resultado += "    ldc " + variable.getValor() + "\n"
-                            +  "    " + variable.asignar() + "\n\n";
-                        } else {
-                            is_identifier = true;
+    @Override
+    public String visitLetStatement(MiniBParser.LetStatementContext ctx){
+        String resultado = "";
+
+        // Obtener el identificador y la expresión
+        String nombre = ctx.IDENTIFIER().getText();
+
+        if(tablaSimbolos.buscarSimbolo(nombre) == null){ // Se esta asignando una variable nueva
+            MyExpression valor = visitExpression(ctx.expression());
+            // Determinar el tipo del valor
+            FinalFactors tipoenum = valor.getType();
+            Simbolo variable = new Simbolo(nombre, tipoenum, valor.evaluar());
+            // Guardar o actualizar el valor en la tabla de símbolos
+            tablaSimbolos.agregarSimbolo(nombre, variable);
+            resultado += "    ldc " + variable.getValor() + "\n"
+            +  "    " + variable.asignar() + "\n\n";
+        } else {
+            is_identifier = true;
                 Simbolo variable = tablaSimbolos.buscarSimbolo(nombre);
                 resultado += visitExpression(ctx.expression());
                 resultado += variable.asignar() + "\n";
@@ -475,7 +475,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                         break;
                     case STRING:
                         instrucciones += "    ldc ";    
-                        instrucciones += "\"" + exp.getTerms().get(i).getfactors().get(0).getValue() + "\"";
+                        instrucciones += (String) exp.getTerms().get(i).getfactors().get(0).getValue();
                         break;
                     case BOOLEAN:
                         instrucciones += "    ldc ";
