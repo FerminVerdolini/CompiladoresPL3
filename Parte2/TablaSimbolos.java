@@ -1,3 +1,5 @@
+import enums.FinalFactors;
+
 import java.util.HashMap;
 
 public class TablaSimbolos {
@@ -7,7 +9,7 @@ public class TablaSimbolos {
         this.tabla = new HashMap<>();
     }
 
-    public void agregarSimbolo(String nombre, String tipo, Object valor){
+    public void agregarSimbolo(String nombre, FinalFactors tipo, Object valor){
         if(tabla.containsKey(nombre)){
             System.out.println("Error: La variable " + nombre + " ya está declarada.");
         } else {

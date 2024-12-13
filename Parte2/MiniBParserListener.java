@@ -409,6 +409,16 @@ public interface MiniBParserListener extends ParseTreeListener {
 	 */
 	void exitArrayAcc(MiniBParser.ArrayAccContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MiniBParser#boolean}.
+	 * @param ctx the parse tree
+	 */
+	void enterBoolean(MiniBParser.BooleanContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniBParser#boolean}.
+	 * @param ctx the parse tree
+	 */
+	void exitBoolean(MiniBParser.BooleanContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MiniBParser#valFunc}.
 	 * @param ctx the parse tree
 	 */
@@ -449,16 +459,6 @@ public interface MiniBParserListener extends ParseTreeListener {
 	 */
 	void exitCopyFunct(MiniBParser.CopyFunctContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MiniBParser#subStringFunc}.
-	 * @param ctx the parse tree
-	 */
-	void enterSubStringFunc(MiniBParser.SubStringFuncContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniBParser#subStringFunc}.
-	 * @param ctx the parse tree
-	 */
-	void exitSubStringFunc(MiniBParser.SubStringFuncContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MiniBParser#concatFunc}.
 	 * @param ctx the parse tree
 	 */
@@ -468,6 +468,16 @@ public interface MiniBParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitConcatFunc(MiniBParser.ConcatFuncContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MiniBParser#subStringFunc}.
+	 * @param ctx the parse tree
+	 */
+	void enterSubStringFunc(MiniBParser.SubStringFuncContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniBParser#subStringFunc}.
+	 * @param ctx the parse tree
+	 */
+	void exitSubStringFunc(MiniBParser.SubStringFuncContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MiniBParser#charAtFunct}.
 	 * @param ctx the parse tree
@@ -499,13 +509,63 @@ public interface MiniBParserListener extends ParseTreeListener {
 	 */
 	void exitArrayAccess(MiniBParser.ArrayAccessContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MiniBParser#boolean}.
+	 * Enter a parse tree produced by the {@code mult}
+	 * labeled alternative in {@link MiniBParser#factorOperations}.
 	 * @param ctx the parse tree
 	 */
-	void enterBoolean(MiniBParser.BooleanContext ctx);
+	void enterMult(MiniBParser.MultContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MiniBParser#boolean}.
+	 * Exit a parse tree produced by the {@code mult}
+	 * labeled alternative in {@link MiniBParser#factorOperations}.
 	 * @param ctx the parse tree
 	 */
-	void exitBoolean(MiniBParser.BooleanContext ctx);
+	void exitMult(MiniBParser.MultContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code div}
+	 * labeled alternative in {@link MiniBParser#factorOperations}.
+	 * @param ctx the parse tree
+	 */
+	void enterDiv(MiniBParser.DivContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code div}
+	 * labeled alternative in {@link MiniBParser#factorOperations}.
+	 * @param ctx the parse tree
+	 */
+	void exitDiv(MiniBParser.DivContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code mod}
+	 * labeled alternative in {@link MiniBParser#factorOperations}.
+	 * @param ctx the parse tree
+	 */
+	void enterMod(MiniBParser.ModContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code mod}
+	 * labeled alternative in {@link MiniBParser#factorOperations}.
+	 * @param ctx the parse tree
+	 */
+	void exitMod(MiniBParser.ModContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code plus}
+	 * labeled alternative in {@link MiniBParser#expOperations}.
+	 * @param ctx the parse tree
+	 */
+	void enterPlus(MiniBParser.PlusContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code plus}
+	 * labeled alternative in {@link MiniBParser#expOperations}.
+	 * @param ctx the parse tree
+	 */
+	void exitPlus(MiniBParser.PlusContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code minus}
+	 * labeled alternative in {@link MiniBParser#expOperations}.
+	 * @param ctx the parse tree
+	 */
+	void enterMinus(MiniBParser.MinusContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code minus}
+	 * labeled alternative in {@link MiniBParser#expOperations}.
+	 * @param ctx the parse tree
+	 */
+	void exitMinus(MiniBParser.MinusContext ctx);
 }

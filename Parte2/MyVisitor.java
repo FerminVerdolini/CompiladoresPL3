@@ -1,14 +1,22 @@
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
+import enums.ExpOperations;
+import enums.FinalFactors;
+import enums.TermOperations;
 import org.antlr.v4.runtime.tree.*;
 
-import java.util.ArrayList;
+import javax.print.DocFlavor;
 
 public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     TablaSimbolos tablaSimbolos = new TablaSimbolos();
-    Integer cont_if = 0;
-    Integer cont_for = 0;
-    Integer cont_while = 0;
+    Integer contador_if = 0;
+    Integer contador_for = 0;
+    Integer contador_while = 0;
     Integer cont_repeat = 0;
+
     String file_name;
     Boolean is_identifier = false;
     Boolean is_val = false;
@@ -39,289 +47,55 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     @Override
     public String visitPrintStatement(MiniBParser.PrintStatementContext ctx){
         String instrucciones = "\n    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
+        List<MyExpression> expressions = new ArrayList<>();
+        FinalFactors type = FinalFactors.NULL;
 
-        evaluar(ctx.expression(0));
-
-        if(is_identifier){
-            is_identifier = false;
-            // Si la expresion es Integer llama a la funcion correspondiente para imprimir enteros
-            instrucciones += evaluar(ctx.expression(0));
-            instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
-
-        } else if(evaluar(ctx.expression(0)) instanceof String){
-            instrucciones += "    ldc ";
-            // Si la expresion es String llama a la funcion y lo evalua entre comillas
-            instrucciones += "\"" + evaluar(ctx.expression(0)) + "\"";
-            instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
-
-        } else if (evaluar(ctx.expression(0)) instanceof Integer) {
-            instrucciones += "    ldc ";
-            // Si la expresion es Integer llama a la funcion correspondiente para imprimir enteros
-            instrucciones += evaluar(ctx.expression(0));
-            instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+        for (int i = 1; i < ctx.expression().size(); i++){
+            expressions.add((MyExpression)visit(ctx.expression(i)));
         }
+        
+        for(MyExpression ex : expressions){
+            for (MyTerm term : ex.getTerms()) {
+                for (MyFactor fact : term.getfactors()) {
+
+                }
+            }
+        }
+        // Object expression = evaluar(ctx.expression(0));
+        
+        // if(is_identifier){
+        //     is_identifier = false;
+        //     instrucciones += tablaSimbolos.buscarSimbolo(expression.toString()).cargarEnPila();
+            
+        //     String tipo = tablaSimbolos.buscarSimbolo(expression.toString()).getTipo();            
+        //     switch (tipo) {
+        //         case "String":
+        //         instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+        //         break;
+        //         case "Integer":
+        //         instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+        //         break;
+        //         case "Character":    
+        //         instrucciones += "\n    invokevirtual java/io/PrintStream/println(C)V\n";
+        //         break;
+        //         default:
+        //         break;
+        //     }            
+        // } else if(expression instanceof String){
+        //     instrucciones += "    ldc ";
+        //     // Si la expresion es String llama a la funcion y lo evalua entre comillas
+        //     instrucciones += "\"" + expression + "\"";
+        //     instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+
+        // } else if (expression instanceof Integer) {
+        //     instrucciones += "    ldc ";
+        //     // Si la expresion es Integer llama a la funcion correspondiente para imprimir enteros
+        //     instrucciones += expression;
+        //     instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+        // }
 
         return instrucciones;
     }
-
-    @Override
-    public Object visitExpression(MiniBParser.ExpressionContext ctx) {
-
-        if(is_identifier){
-            String  resultado = "";
-
-            // Generar código para el primer término
-            resultado += ctx.term(0).accept(this);
-
-            // Si hay más términos, procesarlos con sus operadores
-            for (int i = 1; i < ctx.term().size(); i++) {
-                // Generar código para el siguiente término
-                resultado += ctx.term(i).accept(this);
-
-                // Obtener el operador entre los términos
-                String operador = ctx.getChild(2 * i - 1).getText(); // PLUS o MINUS
-
-                // Generar la instrucción correspondiente al operador
-                if (operador.equals("+")) {
-                    resultado += "    iadd\n"; // Suma
-                } else if (operador.equals("-")) {
-                    resultado += "    isub\n"; // Resta
-                }
-            }
-
-            is_identifier = false;
-
-            return resultado;
-        } else {
-            if (ctx.term().size() == 1 && ctx.term().size() == 1) {
-                // Si la expresión tiene un solo término, se evalúa directamente
-                return evaluar(ctx.term(0));
-            }
-
-            // Procesa operaciones entre términos
-            Object resultado = evaluar(ctx.term(0));
-            for (int i = 1; i < ctx.term().size(); i++) {
-                Object siguiente = evaluar(ctx.term(i));
-                String operador = ctx.getChild(2 * i - 1).getText(); // PLUS o MINUS
-
-                if (operador.equals("+")) {
-                    if (resultado instanceof Integer && siguiente instanceof Integer) {
-                        resultado = (Integer) resultado + (Integer) siguiente;
-                    } else if (resultado instanceof String || siguiente instanceof String) {
-                        resultado = resultado.toString() + siguiente.toString();
-                    }
-                } else if (operador.equals("-")) {
-                    if (resultado instanceof Integer && siguiente instanceof Integer) {
-                        resultado = (Integer) resultado - (Integer) siguiente;
-                    } else {
-                        throw new RuntimeException("Operación no válida para el operador '-'");
-                    }
-                }
-            }
-            return resultado;
-        }
-    }
-
-    @Override
-    public Object visitTerm(MiniBParser.TermContext ctx) {
-        if(is_identifier){
-            String resultado = "";
-
-
-            // Generar código para el primer factor
-            resultado += ctx.factor(0).accept(this);
-
-            // Si hay más factores, procesarlos con sus operadores
-            for (int i = 1; i < ctx.factor().size(); i++) {
-                // Generar código para el siguiente factor
-                resultado += ctx.factor(i).accept(this);
-
-                // Obtener el operador entre los factores
-                String operador = ctx.getChild(2 * i - 1).getText(); // MULT, DIV o MOD
-
-                // Generar la instrucción correspondiente al operador
-                switch (operador) {
-                    case "*":
-                        resultado += "    imul\n";
-                        break;
-                    case "/":
-                        resultado += "    idiv\n";
-                        break;
-                    case "%":
-                    case "MOD":
-                        resultado += "    irem\n";
-                        break;
-                }
-            }
-            return resultado;
-
-        } else {
-            if (ctx.factor().size() == 1) {
-                // Si el término tiene un solo factor, evalúalo directamente
-                return evaluar(ctx.factor(0));
-            }
-
-            Object resultado = evaluar(ctx.factor(0));
-            for (int i = 1; i < ctx.factor().size(); i++) {
-                Object siguiente = evaluar(ctx.factor(i));
-                String operador = ctx.getChild(2 * i - 1).getText().toUpperCase(); // MULT, DIV, MOD
-
-                if (operador.equals("*")) {
-                    resultado = (Integer) resultado * (Integer) siguiente;
-                } else if (operador.equals("/")) {
-                    resultado = (Integer) resultado / (Integer) siguiente;
-                } else if (operador.equals("%") || operador.equals("MOD")) {
-                    resultado = (Integer) resultado % (Integer) siguiente;
-                }
-            }
-            return resultado;
-        }
-    }
-
-    @Override
-    public Object visitNumb(MiniBParser.NumbContext ctx) {
-        if(is_identifier)
-            return "    ldc " + Integer.parseInt((ctx.NUMBER().getText())) + "\n";
-        return Integer.parseInt((ctx.NUMBER().getText()));
-    }
-
-    @Override
-    public Object visitFlotante(MiniBParser.FlotanteContext ctx) {
-        return Float.valueOf(ctx.FLOAT().getText());
-    }
-
-    @Override
-    public Object visitIdent(MiniBParser.IdentContext ctx) {
-        String nombre = ctx.IDENTIFIER().getText();
-        Simbolo simbolo = tablaSimbolos.buscarSimbolo(nombre);
-        if (simbolo == null) {
-            throw new RuntimeException("Variable no declarada: " + nombre);
-        }
-        is_identifier = true;
-        return "    " + simbolo.cargarEnPila().replace("\"","") + "\n";
-    }
-
-    @Override
-    public Object visitParent(MiniBParser.ParentContext ctx) {
-        return super.visitParent(ctx);
-    }
-
-    @Override
-    public Object visitCadena(MiniBParser.CadenaContext ctx) {
-        return ctx.STRING().getText().replace("\"", "");
-    }
-
-    @Override
-    public Object visitCar(MiniBParser.CarContext ctx){
-        return ctx.CHAR().getText();
-    }
-
-    @Override
-    public Object visitBool(MiniBParser.BoolContext ctx){
-        if(ctx.boolean_().FALSE() != null)
-            return 0;
-        else
-            return 1;
-    }
-
-    @Override
-    public Object visitVal(MiniBParser.ValContext ctx) {
-        String str_aux = (String) evaluar(ctx.valFunc().expression());
-        try {
-            Integer.parseInt(str_aux);
-            return str_aux;
-        } catch (NumberFormatException e){
-            return 0;
-        }
-    }
-
-    @Override
-    public Object visitLen(MiniBParser.LenContext ctx) {
-        String aux = (String) evaluar(ctx.lenFunc().expression());
-        return String.valueOf(aux.length());
-    }
-
-    @Override
-    public Object visitIsnan(MiniBParser.IsnanContext ctx) {
-        String aux = (String) evaluar(ctx.isNanFunc().expression());
-        return aux.equals("NaN") ? "true" : "false";
-    }
-
-    @Override
-    public Object visitCopy(MiniBParser.CopyContext ctx) {
-        return visitExpression(ctx.copyFunct().expression());
-    }
-
-    @Override
-    public Object visitConcat(MiniBParser.ConcatContext ctx){
-        String aux = "";
-        for(int i=0; i<ctx.concatFunc().expression().size(); i++){
-            aux += visitExpression(ctx.concatFunc().expression(i)).toString();
-        }
-        return aux;
-    }
-
-    @Override
-    public Object visitSubStr(MiniBParser.SubStrContext ctx) {
-        String aux = (String) evaluar(ctx.subStringFunc().expression(0));
-        Integer start = (Integer) evaluar(ctx.subStringFunc().expression(1));
-        Integer size = (Integer) evaluar(ctx.subStringFunc().expression(2));
-
-        return aux.substring(start, start + size);
-    }
-
-    @Override
-    public Object visitCharAt(MiniBParser.CharAtContext ctx){
-        String aux = (String) evaluar(ctx.charAtFunct().expression(0));
-        int index = (Integer) evaluar(ctx.charAtFunct().expression(1));
-        return aux.charAt(index);
-    }
-
-    @Override
-    public Object visitArrayLit(MiniBParser.ArrayLitContext ctx){
-        //Obtiene el tipo de la primer expresion
-        Object tipo = visitExpression(ctx.arrayLiteral().expression(0));
-
-        // Segun el tipo que sea crea el arreglo de ese tipo de objeto y lo devuelve
-        if(tipo instanceof Integer) {
-            ArrayList<Integer> arreglo = new ArrayList<>();
-            for(int i=0; i<ctx.arrayLiteral().expression().size(); i++){
-                arreglo.add((Integer)visitExpression(ctx.arrayLiteral().expression(i)));
-            }
-            return arreglo;
-        }
-        else if (tipo instanceof Float) {
-            ArrayList<Float> arreglo = new ArrayList<>();
-            for(int i=0; i<ctx.arrayLiteral().expression().size(); i++){
-                arreglo.add((Float) visitExpression(ctx.arrayLiteral().expression(i)));
-            }
-            return arreglo;
-        }
-        else if (tipo instanceof Character) {
-            ArrayList<Character> arreglo = new ArrayList<>();
-            for(int i=0; i<ctx.arrayLiteral().expression().size(); i++){
-                arreglo.add((Character) visitExpression(ctx.arrayLiteral().expression(i)));
-            }
-            return arreglo;
-        }
-        else { //String como opcion por defecto
-            ArrayList<String> arreglo = new ArrayList<>();
-            for(int i=0; i<ctx.arrayLiteral().expression().size(); i++){
-                arreglo.add((String) visitExpression(ctx.arrayLiteral().expression(i)));
-            }
-            return arreglo;
-        }
-    }
-
-    // **********************************************************************************
-    // Primero implementar manejo de arrays en tabla de simbolos para acceder al indice
-    // **********************************************************************************
-    @Override
-    public Object visitArrayAcc(MiniBParser.ArrayAccContext ctx){
-        return "";
-    }
-    // **********************************************************************************
-
 
     @Override
     public String visitLetStatement(MiniBParser.LetStatementContext ctx){
@@ -330,55 +104,32 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         // Obtener el identificador y la expresión
         String nombre = ctx.IDENTIFIER().getText();
 
-
         if(tablaSimbolos.buscarSimbolo(nombre) == null){ // Se esta asignando una variable nueva
-            is_identifier = true;
-            Object valor = visitExpression(ctx.expression());
-
+            MyExpression valor = visitExpression(ctx.expression());
             // Determinar el tipo del valor
-            String tipo;
-            if (valor instanceof Integer) {
-                tipo = "Integer";
-            } else if (valor instanceof String) {
-                tipo = "String";
-            } else if (valor instanceof Integer) {
-                tipo = "Integer";
-            } else {
-                throw new RuntimeException("Tipo desconocido para la variable: " + nombre);
-            }
-
-            Simbolo variable = new Simbolo(nombre, tipo, valor);
-
-            // IF auxiliar para no tener que modificar visitTerm y visitPrin
-            if (tipo == "String")
-                valor = "\"" + valor + "\"";
-
+            FinalFactors tipoenum = valor.getType();
+            Simbolo variable = new Simbolo(nombre, tipoenum, valor.evaluar());
             // Guardar o actualizar el valor en la tabla de símbolos
             tablaSimbolos.agregarSimbolo(nombre, variable);
-            resultado += "    ldc " + valor + "\n"
-                      +  "    " + variable.asignar() + "\n\n";
+            resultado += "    ldc " + variable.getValor() + "\n"
+                    +  "    " + variable.asignar() + "\n\n";
         } else {
             is_identifier = true;
-
             Simbolo variable = tablaSimbolos.buscarSimbolo(nombre);
-
             resultado += visitExpression(ctx.expression());
-
             resultado += variable.asignar() + "\n";
-
         }
-
-
         return resultado; // No devuelve nada, ya que es una declaración
     }
+    
 
     @Override
     public String visitIfStatement(MiniBParser.IfStatementContext ctx) {
 
         // Generar etiquetas únicas
-        String etiquetaElse = "ELSE_BLOCK_" + cont_if;
-        String etiquetaFin = "END_BLOCK_" + cont_if;
-        cont_if++;
+        String etiquetaElse = "ELSE_BLOCK_" + contador_if;
+        String etiquetaFin = "END_BLOCK_" + contador_if;
+        contador_if++;
 
         // Evaluar la condición
         String instrucciones = visitCondition(ctx.condition()) + etiquetaElse;
@@ -478,7 +229,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             instrucciones.append("    goto INCREMENTAR\n");
 
         if(ctx.EXIT() != null){
-            instrucciones.append("    goto LOOP_END_").append(cont_for).append("\n");
+            instrucciones.append("    goto LOOP_END_").append(contador_for).append("\n");
         }
         return instrucciones.toString();
     }
@@ -488,8 +239,8 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         String resultado = "   ; Inicializar las variables locales: \n";
 
         Integer limite = (Integer) evaluar(ctx.expression(1));
-
-        tablaSimbolos.agregarSimbolo(ctx.IDENTIFIER().getText(), "Integer", evaluar(ctx.expression(0)));
+        
+        tablaSimbolos.agregarSimbolo(ctx.IDENTIFIER().getText(), FinalFactors.NUMBER, evaluar(ctx.expression(0)));
         Simbolo indice = tablaSimbolos.buscarSimbolo(ctx.IDENTIFIER().getText());
 
         Integer indice_valor = (Integer) indice.getValor();
@@ -502,10 +253,10 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         resultado += "    ldc " + limite + "        ; Cargar el valor final\n"
                   +  "    istore_2      ; Guardar en la variable local 2\n\n";
 
-        resultado += "LOOP_START_" + cont_for + ":\n"
+        resultado += "LOOP_START_" + contador_for + ":\n"
                   +  "    " + indice.cargarEnPila() + "       ; Cargar i\n"
                   +  "    iload_2       ; Cargar end\n"
-                  +  "    if_icmpgt LOOP_END_" + cont_for + "\n\n"
+                  +  "    if_icmpgt LOOP_END_" + contador_for + "\n\n"
                   +  "    ; Cuerpo del bucle \n";
 
         // Se evalua el bloque de control.
@@ -517,25 +268,59 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                   +  "    iconst_1      ; Cargar el incremento \n"
                   +  "    iadd          ; Sumar i + 1\n"
                   +  "    " + indice_registro + "          ; Guardar el nuevo valor de i\n\n"
-                  +  "    goto LOOP_START_" + cont_for + "\n"
-                  +  "    LOOP_END_" + cont_for + ":\n";
+                  +  "    goto LOOP_START_" + contador_for + "\n"
+                  +  "    LOOP_END_" + contador_for + ":\n";
 
-        cont_for++;
+        contador_for++;
 
         return resultado;
     }
 
     @Override
     public Object visitWhileStatement(MiniBParser.WhileStatementContext ctx) {
-        String resultado = "WHILE_START_" + cont_while + ":\n";
+        String resultado = "WHILE_START_" + contador_while + ":\n";
 
-        resultado += visitCondition(ctx.condition()) + " WHILE_END_" + cont_while + "\n";
+        resultado += visitCondition(ctx.condition()) + " WHILE_END_" + contador_while + "\n";
         resultado += visitBloqueControl(ctx.bloqueControl());
-        resultado += "    goto WHILE_START_" + cont_while + "\n"
-                  +  "WHILE_END_" + cont_while + ": \n";
+        resultado += "    goto WHILE_START_" + contador_while + "\n"
+                  +  "WHILE_END_" + contador_while + ": \n";
 
-        cont_while++;
+        contador_while++;
         return resultado;
+    }
+
+    @Override
+    public MyExpression visitExpression(MiniBParser.ExpressionContext ctx) {
+        List<MyTerm> terms = new ArrayList<>();
+        List<ExpOperations> operations = new ArrayList<>();
+        FinalFactors type = FinalFactors.NULL;
+        Boolean hadIdentifier = false;
+
+        MyTerm term;     
+        for (int i = 0; i < ctx.term().size(); i++){
+            term = (MyTerm)visit(ctx.term(i));
+
+            if(term.getHadIdentifier()){
+                hadIdentifier=true;   
+            }
+            //Compruebo QUE TODOS Tengan el mismo tipo
+            if (i==0) {
+                type = term.getType();        
+            }else{
+                if(type != term.getType()){
+                    //TODO lanzar exepcion
+                }
+            
+            }
+            terms.add(term);
+        }
+
+        for (int i = 1; i < ctx.expOperations().size(); i++){
+            operations.add((ExpOperations)visit(ctx.expOperations(i)));
+        }
+
+        MyExpression exp = new MyExpression(terms,operations,type,hadIdentifier);
+        return exp;
     }
 
     @Override
@@ -554,11 +339,100 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return resultado;
     }
 
+
+    @Override
+    public MyTerm visitTerm(MiniBParser.TermContext ctx) {
+        List<MyFactor> factors = new ArrayList<>();
+        List<TermOperations> operations = new ArrayList<>();
+        FinalFactors type = FinalFactors.NULL;
+        MyFactor fact;
+        Boolean hadIdentifier = false;
+
+
+        for (int i = 0; i < ctx.factor().size(); i++){
+            fact = (MyFactor)visit(ctx.factor(i));
+            //Compruebo QUE TODOS Tengan el mismo tipo
+            if (i==0) {
+                type = fact.getType();
+                if(type.equals(FinalFactors.IDENTIFIER)){
+                    type = tablaSimbolos.buscarSimbolo(fact.getValue().toString()).getTipo();
+                    hadIdentifier = true;
+                }
+            }else{
+                if(fact.getType().equals(FinalFactors.IDENTIFIER)){
+                    if(type != tablaSimbolos.buscarSimbolo(fact.getValue().toString()).getTipo()){
+                        // TODO lanzar excepcion
+                    }
+                    hadIdentifier = true;
+                }else{
+                    if(type != fact.getType()){
+                        //TODO lanzar exepcion
+                    }
+                }
+            }
+            factors.add(fact);
+        }
+
+        for (int i = 0; i < ctx.factorOperations().size(); i++){
+            operations.add((TermOperations)visit(ctx.factorOperations(i)));
+        }
+
+        MyTerm term = new MyTerm(factors,operations,type,hadIdentifier);
+        return term;
+    }
+    
+    
+    @Override
+    public MyFactor visitNumb(MiniBParser.NumbContext ctx){
+        MyFactor num = new MyFactor(Integer.parseInt((ctx.NUMBER().getText())),FinalFactors.NUMBER);
+        return num;        
+    }
+    
+    
+    @Override
+    public MyFactor visitFlotante(MiniBParser.FlotanteContext ctx){
+        MyFactor fl = new MyFactor(Float.parseFloat((ctx.FLOAT().getText())),FinalFactors.FLOAT);
+        return fl;  
+    }
+
+    @Override
+    public MyFactor visitIdent(MiniBParser.IdentContext ctx){
+        // Procesa identificadores
+        String nombre = ctx.IDENTIFIER().getText();
+        Simbolo simbolo = tablaSimbolos.buscarSimbolo(nombre);
+        if (simbolo == null) {
+            throw new RuntimeException("Variable no declarada: " + nombre);
+        }
+
+        MyFactor id = new MyFactor(nombre,FinalFactors.IDENTIFIER);
+
+        return id;
+    }
+
+    @Override
+    public MyFactor visitCar(MiniBParser.CarContext ctx){
+        MyFactor ch = new MyFactor(ctx.CHAR().getText().charAt(1),FinalFactors.CHAR);
+        return ch;
+    }
+
+    @Override
+    public MyFactor visitCadena(MiniBParser.CadenaContext ctx){
+        MyFactor ch = new MyFactor(ctx.STRING().getText(),FinalFactors.STRING);
+        return ch;
+    }
+
+
+
+    @Override
+    public Object visitParent(MiniBParser.ParentContext ctx){
+        return visit(ctx.expression());
+    }
+
     @Override
     public Object visitInputStatement(MiniBParser.InputStatementContext ctx) {
         String nombre = ctx.IDENTIFIER().getText();
         String valor = ctx.STRING().getText();
-        Simbolo nuevo = new Simbolo(nombre, "String", valor);
+        Simbolo nuevo = new Simbolo(nombre, FinalFactors.STRING, valor);
 
         tablaSimbolos.agregarSimbolo(nombre, nuevo);
 
@@ -567,4 +441,172 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return  "    ldc " + valor + "\n"
                 + "    " + nuevo.asignar() + "\n";
     }
-}
+    
+    @Override
+    public Object visitMult(MiniBParser.MultContext ctx){
+        return TermOperations.MULT;
+    }
+    
+    @Override
+    public Object visitDiv(MiniBParser.DivContext ctx){
+        return TermOperations.DIV;
+    }
+    @Override
+    public Object visitMod(MiniBParser.ModContext ctx){
+        return TermOperations.MOD;
+    }
+    
+    @Override
+    public Object visitPlus(MiniBParser.PlusContext ctx){
+        return ExpOperations.PLUS;
+    }
+    @Override
+    public Object visitMinus(MiniBParser.MinusContext ctx){
+        return ExpOperations.MINUS;
+    }
+    
+    // @Override
+    // public List<MyFactor> visitTerm(MiniBParser.TermContext ctx) {
+    //     Lis
+    
+    //     Object resultado = evaluar(ctx.factor(0));
+    
+    //     if (ctx.factor().size() > 1) {
+        //         if(is_identifier){
+    //             //TODO aca deberia llevar un registro de, en caso de haber mas de un factor, que operaciones lleva, tela...
+    
+    //             // String resultado = "";
+    
+    //             // // Generar código para el primer factor
+    //             // resultado += ctx.factor(0).accept(this);
+    
+    //             // // Si hay más factores, procesarlos con sus operadores
+    //             // for (int i = 1; i < ctx.factor().size(); i++) {
+    //             //     // Generar código para el siguiente factor
+    //             //     resultado += ctx.factor(i).accept(this);
+    
+    //             //     // Obtener el operador entre los factores
+    //             //     String operador = ctx.getChild(2 * i - 1).getText(); // MULT, DIV o MOD
+    
+    //             //     // Generar la instrucción correspondiente al operador
+    //             //     switch (operador) {
+    //             //         case "*":
+    //             //             resultado += "    imul\n";
+    //             //             break;
+    //             //         case "/":
+    //             //             resultado += "    idiv\n";
+    //             //             break;
+    //             //         case "%":
+    //             //         case "MOD":
+    //             //             resultado += "    irem\n";
+    //             //             break;
+    //             //     }
+    //             // }
+    //             // return resultado;
+    
+    //         } else {
+        //             for (int i = 1; i < ctx.factor().size(); i++) {
+    //                 Object siguiente = evaluar(ctx.factor(i));
+    //                 String operador = ctx.getChild(2 * i - 1).getText().toUpperCase(); // MULT, DIV, MOD
+    
+    //                 if (operador.equals("*")) {
+        //                     resultado = (Integer) resultado * (Integer) siguiente;
+    //                 } else if (operador.equals("/")) {
+    //                     resultado = (Integer) resultado / (Integer) siguiente;
+    //                 } else if (operador.equals("%") || operador.equals("MOD")) {
+        //                     resultado = (Integer) resultado % (Integer) siguiente;
+        //                 }
+        //             }
+        
+        //             //TODO comprobar si necesito hacer algo con los char y los array aca
+        //         }
+        //     }
+        //     return resultado;
+        // }
+    }
+
+    // @Override
+    // public Object visitExpression(MiniBParser.ExpressionContext ctx) {
+    //     Object resultado = evaluar(ctx.term(0));
+    //     if (ctx.term().size() > 1) {
+    //         if(is_identifier){
+    //             //TODO aca deberia llevar control de que si hay mas de un termino que opeciones se hace con este(una set??);
+    //             //  String  resultado = "";
+
+    //             // // Generar código para el primer término
+    //             // resultado += ctx.term(0).accept(this);
+
+    //             // // Si hay más términos, procesarlos con sus operadores
+    //             // for (int i = 1; i < ctx.term().size(); i++) {
+    //             //     // Generar código para el siguiente término
+    //             //     resultado += ctx.term(i).accept(this);
+
+    //             //     // Obtener el operador entre los términos
+    //             //     String operador = ctx.getChild(2 * i - 1).getText(); // PLUS o MINUS
+
+    //             //     // Generar la instrucción correspondiente al operador
+    //             //     if (operador.equals("+")) {
+    //             //         resultado += "    iadd\n"; // Suma
+    //             //     } else if (operador.equals("-")) {
+    //             //         resultado += "    isub\n"; // Resta
+    //             //     }
+    //             // }
+
+    //             // is_identifier = false;
+
+    //             return "resultado";
+    //         } else {
+    //             for (int i = 1; i < ctx.term().size(); i++) {
+    //                 Object siguiente = evaluar(ctx.term(i));
+    //                 String operador = ctx.getChild(2 * i - 1).getText(); // PLUS o MINUS
+    
+    //                 if (operador.equals("+")) {
+    //                     if (resultado instanceof Integer && siguiente instanceof Integer) {
+    //                         resultado = (Integer) resultado + (Integer) siguiente;
+    //                     } else if (resultado instanceof String || siguiente instanceof String) {
+    //                         resultado = resultado.toString() + siguiente.toString();
+    //                     }
+    //                 } else if (operador.equals("-")) {
+    //                     if (resultado instanceof Integer && siguiente instanceof Integer) {
+    //                         resultado = (Integer) resultado - (Integer) siguiente;
+    //                     } else {
+    //                         throw new RuntimeException("Operación no válida para el operador '-'");
+    //                     }
+    //                 }
+    //                 //TODO comprobar si necesito hacer algo con los char y los array aca
+
+    //             }
+    //         }
+    //     }
+    //     return resultado;
+    // }
+
+    
+    // @Override
+    // public Object visitFactor(MiniBParser.FactorContext ctx) {
+    //     Object factor="";
+    
+    //     if (ctx.NUMBER() != null) {
+    //         factor = (Integer.parseInt((ctx.NUMBER().getText())));
+    //     } else if (ctx.IDENTIFIER() != null) {
+    //         // Procesa identificadores
+    //         String nombre = ctx.IDENTIFIER().getText();
+    //         Simbolo simbolo = tablaSimbolos.buscarSimbolo(nombre);
+    //         if (simbolo == null) {
+        //             throw new RuntimeException("Variable no declarada: " + nombre);
+    //         }
+
+    //         is_identifier = true;
+    //         factor = nombre;
+    
+    //     } else if (ctx.STRING() != null) {
+        //         factor= ctx.STRING().getText().replace("\"", "");
+    //     } else if (ctx.CHAR() != null) {
+    //         factor = ctx.CHAR().getText().charAt(1);
+    //     } else if (ctx.expression() != null) {
+        //         factor = evaluar(ctx.expression());
+    //     }
+    //     return factor;
+    // }
+
+

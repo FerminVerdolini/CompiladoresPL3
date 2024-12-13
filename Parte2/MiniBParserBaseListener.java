@@ -460,6 +460,18 @@ public class MiniBParserBaseListener implements MiniBParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterBoolean(MiniBParser.BooleanContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBoolean(MiniBParser.BooleanContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterValFunc(MiniBParser.ValFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -508,18 +520,6 @@ public class MiniBParserBaseListener implements MiniBParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSubStringFunc(MiniBParser.SubStringFuncContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSubStringFunc(MiniBParser.SubStringFuncContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterConcatFunc(MiniBParser.ConcatFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -527,6 +527,18 @@ public class MiniBParserBaseListener implements MiniBParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitConcatFunc(MiniBParser.ConcatFuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSubStringFunc(MiniBParser.SubStringFuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSubStringFunc(MiniBParser.SubStringFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -568,13 +580,61 @@ public class MiniBParserBaseListener implements MiniBParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBoolean(MiniBParser.BooleanContext ctx) { }
+	@Override public void enterMult(MiniBParser.MultContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBoolean(MiniBParser.BooleanContext ctx) { }
+	@Override public void exitMult(MiniBParser.MultContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDiv(MiniBParser.DivContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDiv(MiniBParser.DivContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMod(MiniBParser.ModContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMod(MiniBParser.ModContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPlus(MiniBParser.PlusContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPlus(MiniBParser.PlusContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMinus(MiniBParser.MinusContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMinus(MiniBParser.MinusContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
