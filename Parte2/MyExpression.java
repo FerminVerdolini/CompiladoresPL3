@@ -26,6 +26,8 @@ public class MyExpression {
         return operations;
     }
 
+    public Object getIdentifier() { return terms.get(0).getfactors().get(0).getValue(); }
+
     public FinalFactors getType() {
         return type;
     }
