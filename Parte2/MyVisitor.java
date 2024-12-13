@@ -5,6 +5,7 @@ import java.util.List;
 import enums.ExpOperations;
 import enums.FinalFactors;
 import enums.TermOperations;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.*;
 
 public class MyVisitor extends MiniBParserBaseVisitor<Object> {
@@ -42,6 +43,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
    @Override
     public String visitPrintStatement(MiniBParser.PrintStatementContext ctx){
+        comprobarErrores(ctx);
         String instrucciones = "\n    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
         MyExpression exp = ((MyExpression)visit(ctx.expression()));
         if(exp.getHadIdentifier()){
@@ -62,8 +64,6 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 case BOOLEAN:
                 instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
                 break;
-                //TODO ver como imprimir los arrays
-                
             }
         }else{
             Object resultado = exp.evaluar();
@@ -89,15 +89,14 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 instrucciones += "\"" + resultado.toString() + "\"";
                 instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
                 break;
-                //TODO ver como imprimir los arrays
-                
             }
         }
         return instrucciones;
     }
-                    
+
     @Override
     public String visitLetStatement(MiniBParser.LetStatementContext ctx){
+        comprobarErrores(ctx);
         String resultado = "";
 
         // Obtener el identificador y la expresión
@@ -124,6 +123,8 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     @Override
     public Object visitRepeatStatement(MiniBParser.RepeatStatementContext ctx) {
+        comprobarErrores(ctx);
+
         String resultado = "REPEAT_START_" + contador_repeat + ":\n";
 
         for(int i=0; i<ctx.statement().size(); i++)
@@ -140,6 +141,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     
     @Override
     public String visitIfStatement(MiniBParser.IfStatementContext ctx) {
+        comprobarErrores(ctx);
 
         // Generar etiquetas únicas
         String etiquetaElse = "ELSE_BLOCK_" + contador_if;
@@ -174,7 +176,8 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     
     @Override
     public String visitCondition(MiniBParser.ConditionContext ctx){
-        
+        comprobarErrores(ctx);
+
         String instrucciones = "";
         String exp1;
         String exp2;
@@ -222,6 +225,8 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     
     @Override
     public String visitBloqueControl(MiniBParser.BloqueControlContext ctx) {
+        comprobarErrores(ctx);
+
         StringBuilder instrucciones = new StringBuilder();
         for (MiniBParser.StatementContext statement : ctx.statement()) {
             instrucciones.append(statement.accept(this));
@@ -237,6 +242,8 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     
     @Override
     public Object visitForStatement(MiniBParser.ForStatementContext ctx) {
+        comprobarErrores(ctx);
+
         String resultado = "   ; Inicializar las variables locales: \n";
         
         MyExpression lim = (MyExpression) evaluar(ctx.expression(1));
@@ -281,6 +288,8 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     
     @Override
     public Object visitWhileStatement(MiniBParser.WhileStatementContext ctx) {
+        comprobarErrores(ctx);
+
         String resultado = "WHILE_START_" + contador_while + ":\n";
         
         resultado += visitCondition(ctx.condition()) + " WHILE_END_" + contador_while + "\n";
@@ -294,6 +303,8 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     @Override
     public MyExpression visitExpression(MiniBParser.ExpressionContext ctx) {
+        comprobarErrores(ctx);
+
         List<MyTerm> terms = new ArrayList<>();
         List<ExpOperations> operations = new ArrayList<>();
         FinalFactors type = FinalFactors.NULL;
@@ -311,7 +322,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 type = term.getType();        
             }else{
                 if(type != term.getType()){
-                    //TODO lanzar exepcion
+                    throw new RuntimeException("Error de operacion con distintos tipos: " + type.toString() + " y " + term.getType().toString());
                 }
             
             }
@@ -328,6 +339,8 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
     @Override
     public MyTerm visitTerm(MiniBParser.TermContext ctx) {
+        comprobarErrores(ctx);
+
         List<MyFactor> factors = new ArrayList<>();
         List<TermOperations> operations = new ArrayList<>();
         FinalFactors type = FinalFactors.NULL;
@@ -347,12 +360,14 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             }else{
                 if(factor.getType().equals(FinalFactors.IDENTIFIER)){
                     if(type != tablaSimbolos.buscarSimbolo(factor.getValue().toString()).getTipo()){
-                       // TODO lanzar excepcion     
+                        FinalFactors type2 = tablaSimbolos.buscarSimbolo(factor.getValue().toString()).getTipo();
+                        throw new RuntimeException("Error de operacion con distintos tipos: " + type.toString() + " y " + type2);
                     }
                     hadIdentifier = true;     
                 }else{
                     if(type != factor.getType()){
-                        //TODO lanzar exepcion
+                        FinalFactors type2 = tablaSimbolos.buscarSimbolo(factor.getValue().toString()).getTipo();
+                        throw new RuntimeException("Error de operacion con distintos tipos: " + type.toString() + " y " + type2);
                     }
                 }
             }
@@ -367,7 +382,6 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         MyTerm term = new MyTerm(factors,operations,type,hadIdentifier);
         return term;
     }
-    
     
     @Override
     public MyFactor visitNumb(MiniBParser.NumbContext ctx){
@@ -533,6 +547,31 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return new MyFactor(aux.charAt(index), FinalFactors.CHAR);
     }
 
+    @Override
+    public Object visitArrayLit(MiniBParser.ArrayLitContext ctx) {
+        return super.visitArrayLit(ctx);
+    }
+
+    @Override
+    public Object visitArrayAccess(MiniBParser.ArrayAccessContext ctx) {
+        return super.visitArrayAccess(ctx);
+    }
+
+    private <T extends ParserRuleContext> void comprobarErrores(T ctx) {
+        // Iterar sobre los hijos del contexto
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            // Si el hijo es un nodo de error, manejarlo
+            if (ctx.getChild(i) instanceof ErrorNode) {
+                visitErrorNode((ErrorNode) ctx.getChild(i));
+            }
+        }
+    }
+
+    @Override
+    public Object visitErrorNode(ErrorNode node) {
+        throw new RuntimeException("Error sintactico: " + node.getText());
+    }
+
     private String evaluarExprOnJasmin(MyExpression exp){
         String instrucciones = "";
         Boolean isFirst = true;
@@ -551,7 +590,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                         instrucciones += (Integer)exp.getTerms().get(i).getfactors().get(0).getValue();
                         break;
                     case STRING:
-                        instrucciones += "    ldc ";    
+                        instrucciones += "    ldc ";
                         instrucciones += (String) exp.getTerms().get(i).getfactors().get(0).getValue();
                         break;
                     case BOOLEAN:
@@ -568,10 +607,24 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 
                 switch (exp.getOperations().get(i-1)) {
                     case PLUS:
-                    instrucciones += "    iadd\n";
+                        switch (exp.getType()){
+                            case NUMBER:
+                                instrucciones += "    iadd\n";
+                                break;
+                            case FLOAT:
+                                instrucciones += "    fadd\n";
+                                break;
+                        }
                     break;
                     case MINUS:
-                    instrucciones += "    isub\n";
+                        switch (exp.getType()){
+                            case NUMBER:
+                                instrucciones += "    isub\n";
+                                break;
+                            case FLOAT:
+                                instrucciones += "    fsub\n";
+                                break;
+                        }
                     break;
                 }
             }else{
@@ -579,6 +632,6 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             }
         }
         
-        return instrucciones;   
+        return instrucciones;
     }
 }

@@ -99,14 +99,13 @@ lenFunc:LEN LPAREN expression RPAREN;
 isNanFunc:ISNAN LPAREN expression RPAREN;
 copyFunct:COPY LPAREN expression RPAREN;
 concatFunc: CONCAT LPAREN expression (COMMA expression)+ RPAREN;
-
 subStringFunc: SUBSTRING LPAREN expression COMMA expression COMMA expression RPAREN;
 charAtFunct: CHARAT LPAREN expression COMMA expression RPAREN;
 
 arrayLiteral: LBRACKET (expression (COMMA expression)*)? RBRACKET;
 arrayAccess: IDENTIFIER LBRACKET expression RBRACKET;
 
-factorOperations:  MULT #mult 
+factorOperations:  MULT #mult
                   | DIV #div
                   | MOD #mod
                   ;

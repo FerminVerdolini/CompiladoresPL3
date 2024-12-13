@@ -40,6 +40,7 @@ public class MyExpression {
     }
 
     public Object evaluar() {
+
         Object resultado = terms.get(0).evaluar(); // Evalúa el primer término
         for (int i = 0; i < operations.size(); i++) {
             ExpOperations operador = operations.get(i);
@@ -48,19 +49,17 @@ public class MyExpression {
                 case PLUS:
                     switch (type) {
                         case NUMBER:
-                            resultado = (Integer)resultado + (Integer)siguiente ;
+                            resultado = (Integer)resultado + (Integer)siguiente;
                             break;
                         case FLOAT:
-                            resultado = (Float)resultado + (Float)siguiente ;
+                            resultado = (Float)resultado + (Float)siguiente;
                             break;
                         case STRING:
                             resultado = (String)resultado + (String)siguiente;
                             break;
                         case BOOLEAN:     
-                        case CHAR:    
-                            //TODO trow exeption 
-                            //todo (quizas el char deberia concatenarse)
-                            break;
+                        case CHAR:
+                            throw new IllegalArgumentException("Operacion inválida con el tipo de dato: " + type);
                         default:
                     }
                     break;
@@ -72,11 +71,8 @@ public class MyExpression {
                         case FLOAT:
                             resultado = (Float)resultado - (Float)siguiente ;
                             break;
-                        case STRING:
-                        case BOOLEAN:     
-                        case CHAR:    
-                            //TODO trow exeption 
-                            break;
+                        case STRING, BOOLEAN, CHAR:
+                            throw new IllegalArgumentException("Operacion inválida con el tipo de dato: " + type);
                         default:
                     }
                     break;
