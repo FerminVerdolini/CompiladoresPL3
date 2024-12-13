@@ -7,12 +7,12 @@
 
 
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "123"
-    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+    ldc 123
+    invokevirtual java/io/PrintStream/println(I)V
 
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "5"
-    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+    ldc 5
+    invokevirtual java/io/PrintStream/println(I)V
 
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc "false"

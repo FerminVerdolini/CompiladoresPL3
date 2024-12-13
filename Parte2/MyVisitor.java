@@ -441,7 +441,98 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     public Object visitMinus(MiniBParser.MinusContext ctx){
         return ExpOperations.MINUS;
     }
-    
+
+    @Override
+    public Object visitVal(MiniBParser.ValContext ctx) {
+        MyExpression expr = visitExpression(ctx.valFunc().expression());
+        String str_aux = (String) expr.evaluar();
+        try {
+            return new MyFactor(Integer.parseInt(str_aux),FinalFactors.NUMBER);
+        } catch (NumberFormatException e){
+            return new MyFactor(0,FinalFactors.NUMBER);
+        }
+    }
+
+    @Override
+    public Object visitLen(MiniBParser.LenContext ctx) {
+        MyExpression expr = visitExpression(ctx.lenFunc().expression());
+        String str_aux = (String) expr.evaluar();
+        Integer size = str_aux.length();
+        return new MyFactor(size, FinalFactors.NUMBER);
+    }
+
+    @Override
+    public Object visitIsnan(MiniBParser.IsnanContext ctx) {
+        MyExpression expr = visitExpression(ctx.isNanFunc().expression());
+        Integer int_aux = (Integer) expr.evaluar();
+        boolean bl = int_aux == 0 ? false : true;
+        return new MyFactor(bl, FinalFactors.BOOLEAN);
+    }
+
+    @Override
+    public Object visitCopy(MiniBParser.CopyContext ctx) {
+        MyExpression exp = visitExpression(ctx.copyFunct().expression());
+        MyFactor fact;
+
+        if(exp.getHadIdentifier()){
+            Simbolo simbolo = tablaSimbolos.buscarSimbolo((String) exp.evaluar());
+            String str_aux = (String) simbolo.getValor();
+            fact = new MyFactor(str_aux.replace("\"",""), FinalFactors.STRING);
+        }else{
+            fact = new MyFactor(evaluarExprOnJasmin(exp), FinalFactors.STRING);
+        }
+        return fact;
+    }
+
+    @Override
+    public Object visitConcat(MiniBParser.ConcatContext ctx) {
+        String aux = "";
+        for(int i=0; i<ctx.concatFunc().expression().size(); i++){
+            MyExpression expr = visitExpression(ctx.concatFunc().expression(i));
+            if(expr.getHadIdentifier()){
+                Simbolo simbolo = tablaSimbolos.buscarSimbolo((String) expr.evaluar());
+                String str_aux = (String) simbolo.getValor();
+                aux += str_aux.replace("\"","");
+            }else {
+                aux += expr.evaluar().toString();
+            }
+        }
+        return new MyFactor(aux, FinalFactors.STRING);
+    }
+
+    @Override
+    public Object visitSubStr(MiniBParser.SubStrContext ctx) {
+        Integer start = (Integer) visitExpression(ctx.subStringFunc().expression(1)).evaluar();
+        Integer size = (Integer) visitExpression(ctx.subStringFunc().expression(2)).evaluar();
+        MyExpression exp = visitExpression(ctx.subStringFunc().expression(0));
+        String aux;
+        if(exp.getHadIdentifier()){
+            Simbolo simbolo = tablaSimbolos.buscarSimbolo((String) exp.evaluar());
+            aux = (String) simbolo.getValor();
+            aux = aux.replace("\"","");
+        } else {
+            aux = (String) exp.evaluar();
+        }
+        aux = aux.substring(start, start + size + 1);
+
+        return new MyFactor(aux, FinalFactors.STRING);
+    }
+
+    @Override
+    public Object visitCharAt(MiniBParser.CharAtContext ctx) {
+        Integer index = (Integer) visitExpression(ctx.charAtFunct().expression(1)).evaluar();
+        MyExpression exp = visitExpression(ctx.charAtFunct().expression(0));
+        String aux;
+        if(exp.getHadIdentifier()){
+            Simbolo simbolo = tablaSimbolos.buscarSimbolo((String) exp.evaluar());
+            aux = (String) simbolo.getValor();
+            aux = aux.replace("\"","");
+        } else {
+            aux = (String) exp.evaluar();
+        }
+        return new MyFactor(aux.charAt(index), FinalFactors.CHAR);
+    }
+
     private String evaluarExprOnJasmin(MyExpression exp){
         String instrucciones = "";
         Boolean isFirst = true;

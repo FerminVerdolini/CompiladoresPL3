@@ -99,6 +99,7 @@ lenFunc:LEN LPAREN expression RPAREN;
 isNanFunc:ISNAN LPAREN expression RPAREN;
 copyFunct:COPY LPAREN expression RPAREN;
 concatFunc: CONCAT LPAREN expression (COMMA expression)+ RPAREN;
+
 subStringFunc: SUBSTRING LPAREN expression COMMA expression COMMA expression RPAREN;
 charAtFunct: CHARAT LPAREN expression COMMA expression RPAREN;
 
