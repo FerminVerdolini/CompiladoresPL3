@@ -196,7 +196,12 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         
         if(ctx.expression().size() == 1) {
             // Evalua la expresion de una sola expresion (0, != 0 o Boolean)
-            instrucciones += "    ldc " + visitExpression(ctx.expression(0)) + "\n";
+            MyExpression expr = (MyExpression) evaluar(ctx.expression(0));
+            if(expr.getHadIdentifier()){
+                instrucciones += evaluarExprOnJasmin(visitExpression(ctx.expression(0)));
+            } else {
+                instrucciones += "   ldc " + expr.evaluar() + "\n";
+            }
             instrucciones += "    ifeq ";
         } else if (ctx.expression().size() == 2) {
             // Evalua la comparacion de dos expresiones

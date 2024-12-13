@@ -11,14 +11,11 @@
     ldc 5
     istore_1
 
-        iload_1
-
-        iload_0
-
+    iload_1
+    iload_0
     if_icmpgt ELSE_BLOCK_0
     ldc 3
-        iload_1
-
+    iload_1
     if_icmpgt ELSE_BLOCK_0    ; Bloque THEN
 
     getstatic java/lang/System/out Ljava/io/PrintStream;

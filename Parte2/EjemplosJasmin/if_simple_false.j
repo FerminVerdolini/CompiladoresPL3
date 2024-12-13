@@ -15,7 +15,7 @@
     goto END_BLOCK_0
 ELSE_BLOCK_0:
 END_BLOCK_0:
-    ldc 0
+   ldc 0
     ifeq ELSE_BLOCK_1    ; Bloque THEN
 
     getstatic java/lang/System/out Ljava/io/PrintStream;
