@@ -1,3 +1,5 @@
+import enums.FinalFactors;
+
 public class Simbolo {
     private String nombre;  // Nombre que se le asigna a la variable
     private FinalFactors tipo;    // Tipo de la variable definida

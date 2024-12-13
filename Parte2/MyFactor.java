@@ -1,3 +1,5 @@
+import enums.FinalFactors;
+
 public class MyFactor {
     
     private Object value;
