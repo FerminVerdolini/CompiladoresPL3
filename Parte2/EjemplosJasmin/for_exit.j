@@ -19,8 +19,7 @@ LOOP_START_0:
 
     ; Cuerpo del bucle 
     ldc 3
-        iload_0
-
+    iload_0
     if_icmpgt ELSE_BLOCK_0    ; Bloque THEN
     goto LOOP_END_0
     goto END_BLOCK_0

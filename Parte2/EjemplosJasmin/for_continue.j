@@ -18,8 +18,8 @@ LOOP_START_0:
     if_icmpgt LOOP_END_0
 
     ; Cuerpo del bucle 
+    ldc 3
     iload_0
-    iload_2
     if_icmplt ELSE_BLOCK_0    ; Bloque THEN
     goto INCREMENTAR
     goto END_BLOCK_0
@@ -27,6 +27,9 @@ ELSE_BLOCK_0:
 END_BLOCK_0:
 
     getstatic java/lang/System/out Ljava/io/PrintStream;
+    iload_0
+
+    invokevirtual java/io/PrintStream/println(I)V
 INCREMENTAR: 
     ; Incrementar i: 1 = 1 + i 
     iload_0           ; Cargar i
