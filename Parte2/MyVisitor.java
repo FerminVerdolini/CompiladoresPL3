@@ -21,9 +21,6 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return tree.accept(this);
     }
 
-
-
-
     @Override
     public Object visitPrograma(MiniBParser.ProgramaContext ctx) {
         String instrucciones = ".class public " + file_name + "\n" +
@@ -96,7 +93,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
             return resultado;
         } else {
-            if (ctx.term().size() == 1) {
+            if (ctx.term().size() == 1 && ctx.term().size() == 1) {
                 // Si la expresión tiene un solo término, se evalúa directamente
                 return evaluar(ctx.term(0));
             }
@@ -234,7 +231,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             Integer.parseInt(str_aux);
             return str_aux;
         } catch (NumberFormatException e){
-            return "0";
+            return 0;
         }
     }
 
@@ -335,6 +332,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
 
 
         if(tablaSimbolos.buscarSimbolo(nombre) == null){ // Se esta asignando una variable nueva
+            is_identifier = true;
             Object valor = visitExpression(ctx.expression());
 
             // Determinar el tipo del valor
@@ -556,5 +554,17 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return resultado;
     }
 
+    @Override
+    public Object visitInputStatement(MiniBParser.InputStatementContext ctx) {
+        String nombre = ctx.IDENTIFIER().getText();
+        String valor = ctx.STRING().getText();
+        Simbolo nuevo = new Simbolo(nombre, "String", valor);
 
+        tablaSimbolos.agregarSimbolo(nombre, nuevo);
+
+        is_identifier = true;
+
+        return  "    ldc " + valor + "\n"
+                + "    " + nuevo.asignar() + "\n";
+    }
 }
