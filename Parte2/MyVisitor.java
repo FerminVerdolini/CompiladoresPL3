@@ -77,7 +77,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 instrucciones += "\n    invokevirtual java/io/PrintStream/println(F)V\n";    
                 break;
                 case CHAR:
-                instrucciones += (Integer)resultado;
+                instrucciones += (Integer) resultado;
                 instrucciones += "\n    invokevirtual java/io/PrintStream/println(C)V\n";
                 break;
                 case STRING:
@@ -200,22 +200,10 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             instrucciones += "    ifeq ";
         } else if (ctx.expression().size() == 2) {
             // Evalua la comparacion de dos expresiones
-            
-            visitExpression(ctx.expression(0));
-            if(is_identifier){
-                exp1 = "    " + visitExpression(ctx.expression(0)) + "\n";
-                is_identifier = false;
-            } else {
-                exp1 = "    ldc " + visitExpression(ctx.expression(0)) + "\n";
-            }
-            
-            visitExpression(ctx.expression(1));
-            if(is_identifier){
-                exp2 = "    " + visitExpression(ctx.expression(1)) + "\n";
-                is_identifier = false;
-            } else {
-                exp2 = "    ldc " + visitExpression(ctx.expression(1)) + "\n";
-            }
+
+            exp1 = evaluarExprOnJasmin(visitExpression(ctx.expression(0)));
+            exp2 = evaluarExprOnJasmin(visitExpression(ctx.expression(1)));
+
             
             instrucciones += exp2 + exp1;
             
@@ -261,12 +249,14 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     public Object visitForStatement(MiniBParser.ForStatementContext ctx) {
         String resultado = "   ; Inicializar las variables locales: \n";
         
-        Integer limite = (Integer) evaluar(ctx.expression(1));
-        
+        MyExpression lim = (MyExpression) evaluar(ctx.expression(1));
+        Integer limite = (Integer) lim.evaluar();
+
         tablaSimbolos.agregarSimbolo(ctx.IDENTIFIER().getText(), FinalFactors.NUMBER, evaluar(ctx.expression(0)));
         Simbolo indice = tablaSimbolos.buscarSimbolo(ctx.IDENTIFIER().getText());
         
-        Integer indice_valor = (Integer) indice.getValor();
+        MyExpression indice_valor_expr = (MyExpression) indice.getValor();
+        Integer indice_valor = (Integer) indice_valor_expr.evaluar();
         String indice_registro = indice.asignar();
         
         
@@ -500,7 +490,6 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             }else{
                 isFirst = false;
             }
-        
         }
         
         return instrucciones;   
