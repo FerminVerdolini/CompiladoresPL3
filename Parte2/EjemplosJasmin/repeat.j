@@ -21,8 +21,7 @@ istore_0
 
     ; UNTIL 
     ldc 5
-        iload_0
-
+    iload_0
     if_icmpeq  END
     goto REPEAT_START_0
 END:

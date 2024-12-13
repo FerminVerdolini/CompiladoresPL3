@@ -7,7 +7,7 @@
 
 
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc ""Hello ""
+    ldc "Hello world!"
     invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
 
 return

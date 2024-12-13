@@ -8,8 +8,7 @@
     ldc 1
     istore_0
 
-        iload_0
-
+    iload_0
     ifeq ELSE_BLOCK_0    ; Bloque THEN
 
     getstatic java/lang/System/out Ljava/io/PrintStream;

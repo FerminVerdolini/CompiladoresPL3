@@ -13,6 +13,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     Integer contador_if = 0;
     Integer contador_for = 0;
     Integer contador_while = 0;
+    Integer contador_repeat = 0;
     String file_name;
     Boolean is_identifier = false;
 
@@ -61,7 +62,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 case BOOLEAN:
                 instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
                 break;
-                //TODO ver c omo imprimir los arrays
+                //TODO ver como imprimir los arrays
                 
             }
         }else{
@@ -88,7 +89,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 instrucciones += "\"" + resultado.toString() + "\"";
                 instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
                 break;
-                //TODO ver c omo imprimir los arrays
+                //TODO ver como imprimir los arrays
                 
             }
         }
@@ -112,13 +113,30 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             resultado += "    ldc " + variable.getValor() + "\n"
             +  "    " + variable.asignar() + "\n\n";
         } else {
-            is_identifier = true;
-                Simbolo variable = tablaSimbolos.buscarSimbolo(nombre);
-                resultado += visitExpression(ctx.expression());
-                resultado += variable.asignar() + "\n";
-            }
-            return resultado; // No devuelve nada, ya que es una declaración
+            Simbolo variable = tablaSimbolos.buscarSimbolo(nombre);
+            MyExpression expr = visitExpression(ctx.expression());
+            resultado += evaluarExprOnJasmin(expr);
+            //resultado += "    ldc " + expr.evaluar().toString() + "\n";
+            resultado += variable.asignar() + "\n";
         }
+        return resultado; // No devuelve nada, ya que es una declaración
+    }
+
+    @Override
+    public Object visitRepeatStatement(MiniBParser.RepeatStatementContext ctx) {
+        String resultado = "REPEAT_START_" + contador_repeat + ":\n";
+
+        for(int i=0; i<ctx.statement().size(); i++)
+            resultado += evaluar(ctx.statement(i));
+
+        resultado += "\n    ; UNTIL \n";
+        resultado += visitCondition(ctx.condition()) + " END" + "\n"
+                +  "    goto REPEAT_START_" + contador_repeat + "\n"
+                +  "END:" + "\n";
+
+        contador_repeat++;
+        return resultado;
+    }
     
     @Override
     public String visitIfStatement(MiniBParser.IfStatementContext ctx) {
@@ -391,6 +409,12 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitBool(MiniBParser.BoolContext ctx) {
+        Integer value = ctx.boolean_().getText().equals("TRUE") ? 1 : 0;
+        return new MyFactor(value,FinalFactors.BOOLEAN);
+    }
+
+    @Override
     public Object visitParent(MiniBParser.ParentContext ctx){
         return visit(ctx.expression());
     }
@@ -399,7 +423,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     public Object visitMult(MiniBParser.MultContext ctx){
         return TermOperations.MULT;
     }
-    
+
     @Override
     public Object visitDiv(MiniBParser.DivContext ctx){
         return TermOperations.DIV;

@@ -10,8 +10,7 @@
 
 WHILE_START_0:
     ldc 5
-        iload_0
-
+    iload_0
     if_icmplt  WHILE_END_0
 
     getstatic java/lang/System/out Ljava/io/PrintStream;

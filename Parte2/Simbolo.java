@@ -57,6 +57,8 @@ public class Simbolo {
     public Object getValor() {
         if(tipo == FinalFactors.STRING){
             return "\"" + valor + "\"";
+        } else if(tipo == FinalFactors.CHAR){
+            return Integer.valueOf((Character)valor);
         }
         return valor;
     }

@@ -12,10 +12,8 @@
     istore_1
 
 WHILE_START_0:
-        iload_1
-
-        iload_0
-
+    iload_1
+    iload_0
     if_icmplt  WHILE_END_0
 
     getstatic java/lang/System/out Ljava/io/PrintStream;
