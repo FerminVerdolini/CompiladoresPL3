@@ -1,29 +1,38 @@
 public class Simbolo {
     private String nombre;  // Nombre que se le asigna a la variable
-    private String tipo;    // Tipo de la variable definida
+    private FinalFactors tipo;    // Tipo de la variable definida
     private Object valor;   // Valor asignado a la variable
     private String[] registro = new String[2];
     private static Integer indice_int = 0;
     private static Integer indice_float = 0;
-    private static Integer indice_string = 0;
+    private static Integer indice_array = 0;
 
-    public Simbolo(String nombre, String tipo, Object valor){
+    public Simbolo(String nombre, FinalFactors tipo, Object valor){
         this.nombre = nombre;
         this.tipo = tipo;
         this.valor = valor;
 
-        if(tipo.equals("Integer")){
-            this.registro[0] = "istore_" + indice_int;
-            this.registro[1] = "iload_" + indice_int;
-            indice_int++;
-        } else if(tipo.equals("Float")){
-            this.registro[0] = "fstore_" + indice_float;
-            this.registro[1] = "fload_" + indice_float;
-            indice_float++;
-        } else if(tipo.equals("String")){
-            this.registro[0] = "astore_" + indice_string;
-            this.registro[1] = "aload_" + indice_string;
-            indice_float++;
+        switch (tipo) {
+            case NUMBER:
+            case CHAR:
+            case BOOLEAN:
+                this.registro[0] = "istore_" + indice_int;
+                this.registro[1] = "iload_" + indice_int;
+                indice_int++;
+                break;
+            case FLOAT:
+                this.registro[0] = "fstore_" + indice_float;
+                this.registro[1] = "fload_" + indice_float;
+                indice_float++;
+                break;
+            case STRING:
+            case ARRAY:
+                this.registro[0] = "astore_" + indice_array;
+                this.registro[1] = "aload_" + indice_array;
+                indice_array++;
+                break;
+            default:
+                break;
         }
     }
 
@@ -35,11 +44,11 @@ public class Simbolo {
         this.nombre = nombre;
     }
 
-    public String getTipo() {
+    public FinalFactors getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(FinalFactors tipo) {
         this.tipo = tipo;
     }
 

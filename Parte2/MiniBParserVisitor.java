@@ -136,11 +136,117 @@ public interface MiniBParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTerm(MiniBParser.TermContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MiniBParser#factor}.
+	 * Visit a parse tree produced by the {@code Numb}
+	 * labeled alternative in {@link MiniBParser#factor}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFactor(MiniBParser.FactorContext ctx);
+	T visitNumb(MiniBParser.NumbContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Flotante}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFlotante(MiniBParser.FlotanteContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Ident}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIdent(MiniBParser.IdentContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Parent}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParent(MiniBParser.ParentContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Cadena}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCadena(MiniBParser.CadenaContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Car}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCar(MiniBParser.CarContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Bool}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBool(MiniBParser.BoolContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Val}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVal(MiniBParser.ValContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Len}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLen(MiniBParser.LenContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Isnan}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIsnan(MiniBParser.IsnanContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Copy}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCopy(MiniBParser.CopyContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Concat}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConcat(MiniBParser.ConcatContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code SubStr}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSubStr(MiniBParser.SubStrContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code CharAt}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCharAt(MiniBParser.CharAtContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ArrayLit}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArrayLit(MiniBParser.ArrayLitContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ArrayAcc}
+	 * labeled alternative in {@link MiniBParser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArrayAcc(MiniBParser.ArrayAccContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MiniBParser#valFunc}.
 	 * @param ctx the parse tree
@@ -201,4 +307,39 @@ public interface MiniBParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitBoolean(MiniBParser.BooleanContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code mult}
+	 * labeled alternative in {@link MiniBParser#factorOperations}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMult(MiniBParser.MultContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code div}
+	 * labeled alternative in {@link MiniBParser#factorOperations}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDiv(MiniBParser.DivContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code mod}
+	 * labeled alternative in {@link MiniBParser#factorOperations}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMod(MiniBParser.ModContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code plus}
+	 * labeled alternative in {@link MiniBParser#expOperations}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPlus(MiniBParser.PlusContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code minus}
+	 * labeled alternative in {@link MiniBParser#expOperations}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMinus(MiniBParser.MinusContext ctx);
 }

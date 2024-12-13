@@ -69,25 +69,26 @@ bloqueControl: (statement+ | CONTINUE | EXIT);
 
 // Expresiones y condiciones
 condition: expression ((LT | LTE | GT | GTE | EQ | NEQ) expression)? (logicalOp condition)?;
-expression: term ((PLUS | MINUS) term)*;
-term: factor ((MULT | DIV | MOD) factor)*;
-factor: NUMBER
-      | FLOAT
-      | IDENTIFIER
-      | LPAREN expression RPAREN 
-      | STRING
-      | CHAR
-      | boolean
-      | valFunc
-      | lenFunc
-      | isNanFunc
-      | copyFunct
-      | concatFunc
-      | subStringFunc
-      | charAtFunct
-      | arrayLiteral
-      | arrayAccess;
-      
+expression: term (expOperations term)*;
+term: factor (factorOperations factor)*;
+factor: NUMBER                      #Numb
+      | FLOAT                       #Flotante
+      | IDENTIFIER                  #Ident
+      | LPAREN expression RPAREN    #Parent
+      | STRING                      #Cadena
+      | CHAR                        #Car
+      | boolean                     #Bool
+      | valFunc                     #Val
+      | lenFunc                     #Len
+      | isNanFunc                   #Isnan
+      | copyFunct                   #Copy
+      | concatFunc                  #Concat
+      | subStringFunc               #SubStr
+      | charAtFunct                 #CharAt
+      | arrayLiteral                #ArrayLit
+      | arrayAccess                 #ArrayAcc
+      ;
+            
 valFunc: VAL LPAREN expression RPAREN;
 lenFunc:LEN LPAREN expression RPAREN;
 isNanFunc:ISNAN LPAREN expression RPAREN;
@@ -95,6 +96,14 @@ copyFunct:COPY LPAREN expression RPAREN;
 subStringFunc: SUBSTRING LPAREN expression COMMA expression COMMA expression RPAREN;
 concatFunc: CONCAT LPAREN expression (COMMA expression)+ RPAREN;
 charAtFunct: CHARAT LPAREN expression COMMA expression RPAREN;
+
 arrayLiteral: LBRACKET (expression (COMMA expression)*)? RBRACKET;
 arrayAccess: IDENTIFIER LBRACKET expression RBRACKET;
 boolean: TRUE | FALSE;
+factorOperations:  MULT #mult 
+                  | DIV #div
+                  | MOD #mod
+                  ;
+expOperations:     PLUS   #plus
+                  | MINUS #minus
+                  ;
