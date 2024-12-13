@@ -40,7 +40,6 @@ public class MyExpression {
         for (int i = 0; i < operations.size(); i++) {
             ExpOperations operador = operations.get(i);
             Object siguiente = terms.get(i + 1).evaluar();
-
             switch (operador) {
                 case PLUS:
                     switch (type) {

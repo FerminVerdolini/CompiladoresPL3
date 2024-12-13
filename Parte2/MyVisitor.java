@@ -39,18 +39,35 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
     @Override
     public String visitPrintStatement(MiniBParser.PrintStatementContext ctx){
         String instrucciones = "\n    getstatic java/lang/System/out Ljava/io/PrintStream;\n";
-        List<MyExpression> expressions = new ArrayList<>();
-        FinalFactors type = FinalFactors.NULL;
+        MyExpression exp = ((MyExpression)visit(ctx.expression()));
+        if(exp.getHadIdentifier()){
+            
+        }else{
+            Object resultado = exp.evaluar();
+            instrucciones += "    ldc ";
+            switch (exp.type) {
+                case NUMBER:
+                    instrucciones += resultado;
+                    instrucciones += "\n    invokevirtual java/io/PrintStream/println(I)V\n";
+                    break;
+                case FLOAT:
+                    instrucciones += resultado;
+                    instrucciones += "\n    invokevirtual java/io/PrintStream/println(F)V\n";    
+                    break;
+                case CHAR:
+                    instrucciones += (Integer)resultado;
+                    instrucciones += "\n    invokevirtual java/io/PrintStream/println(C)V\n";
+                    break;
+                case STRING:
+                    instrucciones += "\"" + resultado + "\"";
+                    instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+                    break;
+                case BOOLEAN:
+                    instrucciones += "\"" + resultado.toString() + "\"";
+                    instrucciones += "\n    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+                    break;
+                //TODO ver c omo imprimir los arrays
 
-        for (int i = 1; i < ctx.expression().size(); i++){
-            expressions.add((MyExpression)visit(ctx.expression(i)));
-        }
-        
-        for(MyExpression ex : expressions){
-            for (MyTerm term : ex.getTerms()) {
-                for (MyFactor fact : term.getfactors()) {
-
-                }
             }
         }
         // Object expression = evaluar(ctx.expression(0));
@@ -117,7 +134,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
                 throw new RuntimeException("Tipo desconocido para la variable: " + nombre);
             }
 
-            Simbolo variable = new Simbolo(nombre, tipo, valor);
+            //Simbolo variable = new Simbolo(nombre, tipo, valor);
             
             // IF auxiliar para no tener que modificar visitTerm y visitPrin
             if (tipo.equals("String")){
@@ -128,9 +145,9 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             }
 
             // Guardar o actualizar el valor en la tabla de símbolos
-            tablaSimbolos.agregarSimbolo(nombre, variable);
-            resultado += "    ldc " + valor + "\n"
-            +  "    " + variable.asignar() + "\n\n";
+        //     tablaSimbolos.agregarSimbolo(nombre, variable);
+        //     resultado += "    ldc " + valor + "\n"
+        //     +  "    " + variable.asignar() + "\n\n";
         } else {
                         is_identifier = true;
 
@@ -258,7 +275,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         
         Integer limite = (Integer) evaluar(ctx.expression(1));
         
-        tablaSimbolos.agregarSimbolo(ctx.IDENTIFIER().getText(), "Integer", evaluar(ctx.expression(0)));
+       // tablaSimbolos.agregarSimbolo(ctx.IDENTIFIER().getText(), "Integer", evaluar(ctx.expression(0)));
         Simbolo indice = tablaSimbolos.buscarSimbolo(ctx.IDENTIFIER().getText());
         
         Integer indice_valor = (Integer) indice.getValor();
@@ -315,7 +332,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         Boolean hadIdentifier = false;
 
         MyTerm term;     
-        for (int i = 1; i < ctx.term().size(); i++){
+        for (int i = 0; i < ctx.term().size(); i++){
             term = (MyTerm)visit(ctx.term(i));
 
             if(term.getHadIdentifier()){
@@ -333,7 +350,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
             terms.add(term);
         }
 
-        for (int i = 1; i < ctx.expOperations().size(); i++){
+        for (int i = 0; i < ctx.expOperations().size(); i++){
             operations.add((ExpOperations)visit(ctx.expOperations(i)));
         }
 
@@ -346,36 +363,35 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         List<MyFactor> factors = new ArrayList<>();
         List<TermOperations> operations = new ArrayList<>();
         FinalFactors type = FinalFactors.NULL;
-        MyFactor factor;
+        MyFactor fact;
         Boolean hadIdentifier = false;
 
-        for (int i = 1; i < ctx.factor().size(); i++){
-            factor = (MyFactor)visit(ctx.factor(i));
-
+        
+        for (int i = 0; i < ctx.factor().size(); i++){
+            fact = (MyFactor)visit(ctx.factor(i));
             //Compruebo QUE TODOS Tengan el mismo tipo
             if (i==0) {
-                type = factor.getType();
+                type = fact.getType();
                 if(type.equals(FinalFactors.IDENTIFIER)){
-                    type = tablaSimbolos.buscarSimbolo(factor.getValue().toString()).getTipo();
+                    type = tablaSimbolos.buscarSimbolo(fact.getValue().toString()).getTipo();
                     hadIdentifier = true;
                 }
             }else{
-                if(factor.getType().equals(FinalFactors.IDENTIFIER)){
-                    if(type != tablaSimbolos.buscarSimbolo(factor.getValue().toString()).getTipo()){
+                if(fact.getType().equals(FinalFactors.IDENTIFIER)){
+                    if(type != tablaSimbolos.buscarSimbolo(fact.getValue().toString()).getTipo()){
                        // TODO lanzar excepcion     
                     }
                     hadIdentifier = true;     
                 }else{
-                    if(type != factor.getType()){
+                    if(type != fact.getType()){
                         //TODO lanzar exepcion
                     }
                 }
             }
-
-            factors.add((MyFactor)visit(ctx.factor(i)));
+            factors.add(fact);
         }
 
-        for (int i = 1; i < ctx.factorOperations().size(); i++){
+        for (int i = 0; i < ctx.factorOperations().size(); i++){
             operations.add((TermOperations)visit(ctx.factorOperations(i)));
         }
 
@@ -383,7 +399,7 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return term;
     }
     
-    
+
     @Override
     public MyFactor visitNumb(MiniBParser.NumbContext ctx){
         MyFactor num = new MyFactor(Integer.parseInt((ctx.NUMBER().getText())),FinalFactors.NUMBER);
@@ -417,15 +433,22 @@ public class MyVisitor extends MiniBParserBaseVisitor<Object> {
         return ch;  
     }
 
+
     @Override
     public MyFactor visitCadena(MiniBParser.CadenaContext ctx){
-        MyFactor ch = new MyFactor(ctx.STRING().getText(),FinalFactors.STRING);
+        MyFactor ch = new MyFactor(ctx.STRING().getText().replace("\"", ""),FinalFactors.STRING);
         return ch;  
     }
 
     @Override
     public Object visitParent(MiniBParser.ParentContext ctx){
         return visit(ctx.expression());
+    }
+
+    @Override
+    public MyFactor visitBool(MiniBParser.BoolContext ctx){
+        MyFactor bl = new MyFactor(ctx.boolean_().getText(),FinalFactors.BOOLEAN);
+        return  bl;
     }
     
     @Override
